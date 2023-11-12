@@ -1,5 +1,5 @@
-import bot
+import discordbot.bot as DiscordBot
 
 if __name__ == "__main__":  # This is the main function
-    bot.run_discord_bot()
+    DiscordBot.run_discord_bot()
     pass

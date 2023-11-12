@@ -3,7 +3,9 @@ import responses
 import toml
 
 
-async def send_message(message, user_message, is_private=False):
+async def send_message(
+    message, user_message, is_private=False
+):  # This is the function that sends the message
     try:
         response = responses.handle_responses(user_message)
         await message.author.send(response) if is_private else await message.channel.send(response)
@@ -26,14 +28,14 @@ def run_discord_bot():
     async def on_message(message):
         if message.author == client.user:
             return
-        print(message)
         username = str(message.author)  # This gets the username of the user
         user_message = message.content.lower()  # This gets the message the user sent
         channel = message.channel  # This gets the channel the message was sent in
-        print(
-            f"{username} said: {user_message}, in channel({channel})"
-        )  # This prints the message to the console
-        if channel == "bot-chat":
+        if str(channel) == "bot-chat":
+            print(
+                f"{username} said: {user_message}, in channel({channel})"
+            )  # This prints the message to the console
+
             if message.content.startswith(
                 "?"
             ):  # This checks if the message starts with a "?" and if so sends the message directly to the user

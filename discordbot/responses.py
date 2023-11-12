@@ -11,5 +11,4 @@ def handle_responses(message):
     if p_message == "!help":
         return "`This message is helpful most the time`"
 
-    print("BOOM", message)
     return "I dont know what you mean by that"
