@@ -1,0 +1,2 @@
+Supreme Oversight Board (SOB)
+At the pinnacle of the HAAS hierarchy is the Supreme Oversight Board (SOB), a collective of high-level agents modeled after wise and ethical archetypes from various cultures and narratives.

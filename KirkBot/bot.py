@@ -1,5 +1,5 @@
 import discord
-import responses
+import KirkBot.responses as responses
 import toml
 
 
@@ -15,7 +15,7 @@ async def send_message(
 
 
 def run_discord_bot():
-    TOKEN = toml.load("config.toml")["token"]
+    TOKEN = toml.load("config.toml")["kirkToken"]
     intents = discord.Intents.default()  # This sets up the default intents
     intents.message_content = True  # This allows the bot to read messages
     client = discord.Client(intents=intents)
@@ -32,15 +32,13 @@ def run_discord_bot():
         user_message = message.content.lower()  # This gets the message the user sent
         channel = message.channel  # This gets the channel the message was sent in
         if str(channel) == "bot-chat":
-            print(
-                f"{username} said: {user_message}, in channel({channel})"
-            )  # This prints the message to the console
-
-            if message.content.startswith(
+            if user_message.startswith(
                 "?"
             ):  # This checks if the message starts with a "?" and if so sends the message directly to the user
-                await send_message(message, message.content[1:], is_private=True)
-            else:
-                await send_message(message, message.content, is_private=False)
+                await send_message(message, user_message[1:], is_private=True)
+            elif user_message.startswith("k!"):
+                await send_message(message, user_message[2:])
+            elif user_message.startswith("all!"):
+                await send_message(message, user_message[5:])
 
     client.run(TOKEN)
