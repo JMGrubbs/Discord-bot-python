@@ -9,28 +9,28 @@ client = OpenAI(
     api_key=api_key,
 )
 
-# thread = client.beta.threads.create()
+thread = client.beta.threads.create()
 
 gpt_thread_id = "thread_9Cqr5vN2lkZxiTtdMbUvGC6k"
-# messageText = "Who are you?"
-# message = client.beta.threads.messages.create(
-#     thread_id=gpt_thread_id,
-#     role="user",
-#     content=messageText,
-# )
+messageText = "Who are you?"
+message = client.beta.threads.messages.create(
+    thread_id=gpt_thread_id,
+    role="user",
+    content=messageText,
+)
 
-# run = client.beta.threads.runs.create(
-#     thread_id=gpt_thread_id,
-#     assistant_id=assistant_id,
-# )
+run = client.beta.threads.runs.create(
+    thread_id=gpt_thread_id,
+    assistant_id=assistant_id,
+)
 
-# run = client.beta.threads.runs.retrieve(thread_id=gpt_thread_id, run_id=run.id)
+run = client.beta.threads.runs.retrieve(thread_id=gpt_thread_id, run_id=run.id)
 
-# # to get value of a message
-# # messages.data[0].content[0].text.value
-# print("waiting")
+# to get value of a message
+# messages.data[0].content[0].text.value
+print("waiting")
 
-# time.sleep(10)
+time.sleep(10)
 
 
 messages = client.beta.threads.messages.list(thread_id=gpt_thread_id)
