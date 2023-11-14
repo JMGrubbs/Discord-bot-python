@@ -1,6 +1,7 @@
 import discord
-import NaeblisBot.responses as responses
 import toml
+
+import NaeblisBot.responses as responses
 
 
 async def send_message(
@@ -15,7 +16,7 @@ async def send_message(
 
 
 def run_discord_bot():
-    TOKEN = toml.load("config.toml")["naeblisToken"]
+    TOKEN = toml.load("config.toml")["discordbots"]["naeblisToken"]
     intents = discord.Intents.default()  # This sets up the default intents
     intents.message_content = True  # This allows the bot to read messages
     client = discord.Client(intents=intents)
@@ -28,17 +29,27 @@ def run_discord_bot():
     async def on_message(message):
         if message.author == client.user:
             return
-        username = str(message.author)  # This gets the username of the user
+        # username = str(message.author)  # This gets the username of the user
         user_message = message.content.lower()  # This gets the message the user sent
         channel = message.channel  # This gets the channel the message was sent in
         if str(channel) == "bot-chat":
             if user_message.startswith(
                 "?"
             ):  # This checks if the message starts with a "?" and if so sends the message directly to the user
-                await send_message(message, user_message[2:], is_private=True)
+                await send_message(
+                    message,
+                    user_message[2:],
+                    is_private=True,
+                )
             elif user_message.startswith("n!"):
-                await send_message(message, user_message[3:])
+                await send_message(
+                    message,
+                    user_message[3:],
+                )
             elif user_message.startswith("all!"):
-                await send_message(message, user_message[5:])
+                await send_message(
+                    message,
+                    user_message[5:],
+                )
 
     client.run(TOKEN)
