@@ -15,7 +15,7 @@ async def send_message(
 
 
 def run_discord_bot():
-    TOKEN = toml.load("config.toml")["alexanderToken"]
+    TOKEN = toml.load("config.toml")["discordbots"]["alexanderToken"]
     intents = discord.Intents.default()  # This sets up the default intents
     intents.message_content = True  # This allows the bot to read messages
     client = discord.Client(intents=intents)
@@ -28,7 +28,7 @@ def run_discord_bot():
     async def on_message(message):
         if message.author == client.user:
             return
-        username = str(message.author)  # This gets the username of the user
+        # username = str(message.author)  # This gets the username of the user
         user_message = message.content.lower()  # This gets the message the user sent
         channel = message.channel  # This gets the channel the message was sent in
         if str(channel) == "bot-chat":

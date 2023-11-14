@@ -5,7 +5,8 @@ import time
 assistant_id = toml.load("config.toml")["openai"]["naeblis"]
 api_key = toml.load("config.toml")["openai"]["api_key"]
 
-gtp_thread_id = "thread_X3n0c3tBb2TAb4EylyGJPcJG"
+gtp_thread_id = toml.load("config.toml")["openai"]["naeblisThread"]
+
 
 client = OpenAI(
     api_key=api_key,
