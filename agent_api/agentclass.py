@@ -11,7 +11,7 @@ class Agents:
         self.gpt_latest_prompt_response = None
         self.gpt_run = None
 
-        self.gpt_api_key = toml.load("config.toml")["openai"]["api_key"]
+        self.gpt_api_key = toml.load("api_config.toml")["openai"]["api_key"]
         self.gpt_client = OpenAI(
             api_key=self.gpt_api_key,
         )
@@ -50,9 +50,9 @@ class Agents:
         )
 
     # This function gets the newest input prompt added to the thread
-    def get_gpt_latest_prompt(self, input_message):
+    def get_gpt_latest_prompt(self):
         if self.gpt_latest_input_prompt is None:
-            self.create_gpt_prompt(input_message)
+            return "Ask a question."
         return self.gpt_latest_input_prompt
 
     # Run functions ----------------------------
@@ -78,6 +78,12 @@ class Agents:
                 completed = True
             time.sleep(1)  # sleep to avoid hitting the API too frequently
 
+    # Response functions ----------------------------
+    # This function gets the latest response from chatGPT agent in the current thread
+    def get_gpt_latest_response(self):
+        return self.gpt_latest_prompt_response
+
+    def set_gpt_latest_response(self):
         self.gpt_latest_prompt_response = (
             self.gpt_client.beta.threads.messages.list(thread_id=self.gpt_current_thread.id)
             .data[0]
@@ -85,14 +91,12 @@ class Agents:
             .text.value
         )
 
-    # Response functions ----------------------------
-    # This function gets the latest response from chatGPT agent in the current thread
-    def get_gpt_latest_response(self):
-        return self.gpt_latest_prompt_response
-
     # Operational functions ----------------------------
     # The funtion runs the entire process of creating a new thread, adding a message to the thread, running the thread, and returning the response
     def run_gpt(self, input_message):
+        print(input_message)
         self.create_gpt_prompt(input_message)
+        self.get_gpt_latest_prompt(input_message)
         self.run_gpt_prompt()
+        self.set_gpt_latest_response()
         return self.get_gpt_latest_response()

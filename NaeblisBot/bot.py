@@ -7,7 +7,7 @@ import NaeblisBot.responses as responses
 # This is the function that sends the message
 async def send_message(assistant_id, message, user_message, is_private=False):
     try:
-        response = responses.handle_responses(user_message, assistant_id)
+        response = await responses.handle_responses(user_message, assistant_id)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
         print(e)

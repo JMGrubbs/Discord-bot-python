@@ -6,7 +6,7 @@ assistant_id = toml.load("config.toml")["openai"]["naeblis"]
 
 init_data = {
     "gpt_assistant_id": assistant_id,
-    "converce_command": "/naeblis",  # Replace or dynamically set as needed
+    "converce_command": "/naeblis",  # Dynamically set as needed
     "agent_api_key": toml.load("config.toml")["agent_api"]["api_key"],
 }
 
