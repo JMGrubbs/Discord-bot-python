@@ -1,19 +1,20 @@
 from openai import OpenAI
 import time
+import toml
 
 
 class Agents:
-    def __init__(self, init_data) -> None:
-        self.gpt_assistant_id = init_data["gpt_assistant_id"]
-        self.converce_command = init_data["converce_command"]
-        gpt_api_key = init_data["gpt_api_key"]
+    def __init__(self, assistant_id) -> None:
+        self.gpt_assistant_id = assistant_id
         self.gpt_current_thread = None
-        self.gpt_client = OpenAI(
-            api_key=gpt_api_key,
-        )
         self.gpt_latest_input_prompt = None
         self.gpt_latest_prompt_response = None
         self.gpt_run = None
+
+        self.gpt_api_key = toml.load("config.toml")["openai"]["api_key"]
+        self.gpt_client = OpenAI(
+            api_key=self.gpt_api_key,
+        )
 
     # Thread functions -----------------------------
     # This function creates a new thread using the openAI API
@@ -85,5 +86,13 @@ class Agents:
         )
 
     # Response functions ----------------------------
+    # This function gets the latest response from chatGPT agent in the current thread
     def get_gpt_latest_response(self):
         return self.gpt_latest_prompt_response
+
+    # Operational functions ----------------------------
+    # The funtion runs the entire process of creating a new thread, adding a message to the thread, running the thread, and returning the response
+    def run_gpt(self, input_message):
+        self.create_gpt_prompt(input_message)
+        self.run_gpt_prompt()
+        return self.get_gpt_latest_response()
