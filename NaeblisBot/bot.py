@@ -52,14 +52,12 @@ def run_discord_bot():
                 await handle_create_thread(message, user_message, is_private=False)
             if user_message.startswith("?"):
                 await send_message(
-                    current_thread,
                     message,
                     user_message[2:],
                     is_private=True,
                 )
             elif user_message.startswith("/n"):
                 await send_message(
-                    current_thread,
                     message,
                     user_message[3:],
                 )
