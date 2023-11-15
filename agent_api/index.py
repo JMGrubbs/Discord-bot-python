@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from agentclass import Agents
+import toml
 
 # import json
 
@@ -17,6 +18,8 @@ def get_or_create_agent(assistant_id):
 
 @app.route("/send_prompt", methods=["POST"])
 def send_prompt():
+    if request.headers["api_key"] != toml.load("config.toml")["agent_api"]["api_key"]:
+        return jsonify({"error": "Invalid API key"}), 401
     # data example: { "assistant_id": "some-assistant-id", "message": "Hello, how are you?" }
     data = request.json
     assistant_id = data.get("assistant_id")
@@ -32,6 +35,8 @@ def send_prompt():
 
 @app.route("/get_response", methods=["GET"])
 def get_response():
+    if request.headers["api_key"] != toml.load("config.toml")["agent_api"]["api_key"]:
+        return jsonify({"error": "Invalid API key"}), 401
     assistant_id = request.args.get("assistant_id")
 
     if not assistant_id:
