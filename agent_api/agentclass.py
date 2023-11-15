@@ -19,13 +19,13 @@ class Agents:
     # Thread functions -----------------------------
     # This function creates a new thread using the openAI API
     def create_gpt_thread(self):
-        self.gpt_current_thread = self.gpt_client.beta.threads.create()
+        return self.gpt_client.beta.threads.create()
 
     # This function gets the current thread
     def get_thread(self):
-        if self.current_thread is None:
-            self.current_thread = self.create_gpt_thread()
-        return self.current_thread
+        if self.gpt_current_thread is None:
+            self.gpt_current_thread = self.create_gpt_thread()
+        return self.gpt_current_thread
 
     # Client functions -----------------------------
     # The function creates a new client using the openAI API
@@ -43,7 +43,7 @@ class Agents:
     # Prompt functions ----------------------------
     # This function creates a new prompt and adds it to the current thread
     def create_gpt_prompt(self, input_message):
-        self.gpt_latest_input_prompt = self.gpt_client.beta.threads.messages.create(
+        return self.gpt_client.beta.threads.messages.create(
             thread_id=self.gpt_current_thread.id,
             role="user",
             content=input_message,
@@ -52,16 +52,16 @@ class Agents:
     # This function gets the newest input prompt added to the thread
     def get_gpt_latest_prompt(self):
         if self.gpt_latest_input_prompt is None:
-            return "Ask a question."
+            self.gpt_latest_input_prompt = "Ask a question."
         return self.gpt_latest_input_prompt
 
     # Run functions ----------------------------
     # This function runs the current thread after a message has been created and added to the thread
     def create_gpt_run(self):
-        self.gpt_run = self.gpt_client.beta.threads.runs.create(
+        return self.gpt_client.beta.threads.runs.create(
             thread_id=self.gpt_current_thread.id,
             assistant_id=self.gpt_assistant_id,
-            instructions=["Adhear to the given instructions."],
+            instructions="Adhear to the given instructions.",
         )
 
     # This function gets the latest run from the current thread
@@ -79,10 +79,7 @@ class Agents:
             time.sleep(1)  # sleep to avoid hitting the API too frequently
 
     # Response functions ----------------------------
-    # This function gets the latest response from chatGPT agent in the current thread
-    def get_gpt_latest_response(self):
-        return self.gpt_latest_prompt_response
-
+    # This function gets the latest response from the current thread
     def set_gpt_latest_response(self):
         self.gpt_latest_prompt_response = (
             self.gpt_client.beta.threads.messages.list(thread_id=self.gpt_current_thread.id)
@@ -91,12 +88,15 @@ class Agents:
             .text.value
         )
 
+    # This function gets the latest response from chatGPT agent in the current thread
+    def get_gpt_latest_response(self):
+        return self.gpt_latest_prompt_response
+
     # Operational functions ----------------------------
     # The funtion runs the entire process of creating a new thread, adding a message to the thread, running the thread, and returning the response
     def run_gpt(self, input_message):
-        print(input_message)
-        self.create_gpt_prompt(input_message)
-        self.get_gpt_latest_prompt(input_message)
+        self.get_thread()
+        self.gpt_latest_input_prompt = self.create_gpt_prompt(input_message)
         self.run_gpt_prompt()
         self.set_gpt_latest_response()
-        return self.get_gpt_latest_response()
+        return self.gpt_latest_prompt_response
