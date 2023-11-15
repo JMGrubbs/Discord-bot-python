@@ -1,13 +1,13 @@
 import discord
 import toml
 
-import NaeblisBot.responses as responses
+import AgentBot.responses as responses
 
 
 # This is the function that sends the message
 async def send_message(assistant_id, message, user_message, is_private=False):
     try:
-        response = await responses.handle_responses(user_message, assistant_id)
+        response = responses.handle_responses(user_message, assistant_id)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
         print(e)
@@ -16,7 +16,7 @@ async def send_message(assistant_id, message, user_message, is_private=False):
 
 def run_discord_bot(init_data):
     assistant_id = init_data["gpt_assistant_id"]
-    TOKEN = toml.load("config.toml")["discordbots"]["naeblisToken"]
+    TOKEN = toml.load("config.toml")["discordbots"][init_data.get("name") + "Token"]
     intents = discord.Intents.default()  # This sets up the default intents
     intents.message_content = True  # This allows the bot to read messages
     client = discord.Client(intents=intents)  # This sets the client up with the intents
