@@ -91,12 +91,3 @@ class Agents:
     # This function gets the latest response from chatGPT agent in the current thread
     def get_gpt_latest_response(self):
         return self.gpt_latest_prompt_response
-
-    # Operational functions ----------------------------
-    # The funtion runs the entire process of creating a new thread, adding a message to the thread, running the thread, and returning the response
-    def run_gpt(self, input_message):
-        self.get_thread()
-        self.gpt_latest_input_prompt = self.create_gpt_prompt(input_message)
-        self.run_gpt_prompt()
-        self.set_gpt_latest_response()
-        return self.gpt_latest_prompt_response

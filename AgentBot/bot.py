@@ -8,6 +8,7 @@ import AgentBot.responses as responses
 async def send_message(assistant_id, message, user_message, is_private=False):
     try:
         response = responses.handle_responses(user_message, assistant_id)
+        print(response)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
         print(e)
@@ -33,6 +34,8 @@ def run_discord_bot(init_data):
         user_message = message.content.lower()  # This gets the message the user sent
         channel = message.channel  # This gets the channel the message was sent in
         if str(channel) == "bot-chat":
+            if user_message == "Stop.":
+                await channel.send("Concluded!")
             # if user_message.startswith("?"):
             #     await send_message(
             #         assistant_id,
@@ -46,6 +49,12 @@ def run_discord_bot(init_data):
                     assistant_id,
                     message,
                     user_message[cutoff:],
+                )
+            if user_message.startswith("/all"):
+                await send_message(
+                    assistant_id,
+                    message,
+                    user_message[4:],
                 )
 
     client.run(TOKEN)

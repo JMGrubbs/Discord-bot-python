@@ -1,0 +1,1 @@
+For this whole conversation, you will reply with "start" or "stop" depending on which you think is more appropriate a response and NOTHING else, no matter what is said.
