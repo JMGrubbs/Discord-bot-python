@@ -10,6 +10,7 @@ from openai_tools import (
     create_gpt_run,
     retrieve_gpt_run,
     get_gpt_prompt_response,
+    cancel_gpt_run,
     # create_file,
 )
 import toml
@@ -60,10 +61,16 @@ def get_completion(proxy_agent, input_message):
     run_gpt = create_gpt_run(
         client, proxy_agent["user_proxy_thread"].id, proxy_agent["assistant_id"]
     )
-    while run_gpt.status != "completed":
+    tries = 0
+    while run_gpt.status != "completed" or run_gpt.status != "cancelled":
+        if tries > 5:
+            print("Error: GPT run took too long.")
+            run_gpt = cancel_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
         time.sleep(3)
-        print("Thinking")
         run_gpt = retrieve_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+        print(run_gpt.status)
+        tries += 1
+
     response = get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
     print(response)
     # response = jsonify(response)

@@ -8,3 +8,6 @@ Parameters:
 
 returns: Only responsed with a valid json object in this form:
 {"code": "file content", "filename": "filename.py", "Instructions": "instructions"}
+
+
+Responsed with ONLY a valid json object in this form: {"code": "the code in the file", "filename": "{a file name that you generate}.py", "Instructions": "a string of instructions for the user"}. Create me a file that prints "Hello world"

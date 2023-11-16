@@ -2,7 +2,7 @@
 # from pydantic import Field
 # from instructor import OpenAISchema
 # import subprocess
-import os
+# import os
 
 
 def create_gpt_thread(client):
@@ -21,8 +21,8 @@ def create_gpt_run(client, thread_id, assistant_id):
     return client.beta.threads.runs.create(
         thread_id=thread_id,
         assistant_id=assistant_id,
-        instructions="""Responsed with ONLY a valid json object in this form:
-        {"code": "the code in the file", "filename": "{a file name that you generate}.py", "Instructions": "a string of instructions for the user"}""",
+        # instructions="""Responsed with ONLY a valid json object in this form:
+        # {"code": "the code in the file", "filename": "{a file name that you generate}.py", "Instructions": "a string of instructions for the user"}""",
     )
 
 
@@ -35,6 +35,13 @@ def retrieve_gpt_run(client, thread_id, run_id):
 
 def get_gpt_prompt_response(client, thread_id):
     return client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0].text.value
+
+
+def cancel_gpt_run(client, thread_id, run_id):
+    return client.beta.threads.runs.cancel(
+        thread_id=thread_id,
+        run_id=run_id,
+    )
 
 
 # def create_file(file_name, body, directory):
