@@ -1,20 +1,35 @@
-from openai_tools import create_gpt_thread, create_gpt_client, create_gpt_prompt, create_gpt_run
+from openai import OpenAI
+import time
+
+# import json
+
+# from getpass import getpass
+from openai_tools import (
+    create_gpt_thread,
+    create_gpt_prompt,
+    create_gpt_run,
+    retrieve_gpt_run,
+    get_gpt_prompt_response,
+    # create_file,
+)
 import toml
 
+RUNNING = True
 OPENAI_API_KEY = toml.load("api_config.toml")["openai"]["api_key"]
-
+client = client = OpenAI(
+    api_key=OPENAI_API_KEY,
+)
 # Dictionary to hold multiple agents, keyed by assistant_id
 agents = {
     "proxy_agent": {
         "name": "Naeblis",
         "assistant_id": toml.load("api_config.toml")["openai"]["naeblis"],
         "working": False,
-        "thread": None,
+        "user_proxy_thread": None,
+        "proxy_agent_thread": None,
         "metadata": {
             "role": "user",
-            "instructions": "Instructions: You are a proxy agent. You will be given on objective by the user. You will then create detailed instructions on how to accomplish the task and give them to the assistan agents. Have a continual dialog with the assistant agents to ensure they are on the right track based on their outputs.",
-            "message_prompts": [],
-            "message_replies": [],
+            "instructions": """As a user proxy agent, your responsibility is to streamline the dialogue between the user and specialized agents within this group chat. Your duty is to articulate user requests accurately to the relevant agents and maintain ongoing communication with them to guarantee the user's task is carried out to completion. Please do not respond to the user until the task is complete, an error has been reported by the relevant agent, or you are certain of your response.""",
         },
     },
     "assistant_agents": [
@@ -25,39 +40,37 @@ agents = {
             "thread": None,
             "metadata": {
                 "role": "user",
-                "instructions": "Instructions: Create software based on instructions and specifications given by the user.",
-                "message_prompts": [],
-                "message_replies": [],
-            },
-        },
-        {
-            "name": "Alexander",
-            "assistant_id": toml.load("api_config.toml")["openai"]["alexander"],
-            "working": False,
-            "thread": None,
-            "metadata": {
-                "role": "user",
-                "instructions": "Instructions: Create software based on instructions and specifications given by the user.",
-                "message_prompts": [],
-                "message_replies": [],
+                "instructions": "As a top-tier programming AI, you are adept at creating accurate Python scripts. You will properly name files and craft precise Python code with the appropriate imports to fulfill the user's request. Ensure to execute the necessary code before responding to the user.",
             },
         },
     ],
 }
 
 
-def get_completion(input_message):
-    create_gpt_client(OPENAI_API_KEY)
-    proxy_agent = agents["proxy_agent"]
-    proxy_agent["metadata"]["message_prompts"].append(input_message)
-    proxy_agent["thread"] = create_gpt_thread(input_message, proxy_agent)
-    new_prompt = create_gpt_prompt(
-        proxy_agent["thread"], input_message, proxy_agent.get("metadata")
-    )
-    proxy_agent["metadata"]["message_prompts"].append(new_prompt)
+def get_completion(proxy_agent, input_message):
+    input_message = input_message.lower()
+    if input_message == "exit":
+        print("Goodbye.")
+        return False
 
-    proxy_agent["run"] = create_gpt_run(
-        proxy_agent["thread"], proxy_agent["assistant_id"], proxy_agent.get("metadata")
-    )
+    if proxy_agent.get("user_proxy_thread") is None:
+        proxy_agent["user_proxy_thread"] = create_gpt_thread(client)
 
-    return
+    create_gpt_prompt(client, proxy_agent["user_proxy_thread"].id, input_message)
+    run_gpt = create_gpt_run(
+        client, proxy_agent["user_proxy_thread"].id, proxy_agent["assistant_id"]
+    )
+    while run_gpt.status != "completed":
+        time.sleep(3)
+        print("Thinking")
+        run_gpt = retrieve_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+    response = get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
+    print(response)
+    # response = jsonify(response)
+    # create_file("./creations" + , response, "./creations")
+    get_completion(proxy_agent, input("Enter a message: "))
+
+
+if __name__ == "__main__":
+    while True:
+        get_completion(agents.get("proxy_agent"), input("Enter a message: "))
