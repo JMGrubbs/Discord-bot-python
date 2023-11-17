@@ -10,3 +10,8 @@ Example response: "{"code": "print('Hello world')", "filename": "hello.py", "Ins
 
 
 I want a python script that returns the current datetime in humanreadble format
+
+I want a python script that prints all the prime numbers under 100
+
+
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list. You may assume the two numbers do not contain any leading zero, except the number 0 itself.

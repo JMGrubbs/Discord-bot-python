@@ -67,8 +67,23 @@ def create_run_file(json_object):
 
 
 def conver_to_json(string):
+    json_object = None
+    Error = None
+    try:
+        json_object = json.loads(string[7:-3])
+        return json_object
+    except Exception as e:
+        Error = str(("JSON ERROR: ", e))
+
+    try:
+        json_object = json.loads(string[3:-3])
+        return json_object
+    except Exception as e:
+        Error = str(("JSON ERROR: ", e))
+
     try:
         json_object = json.loads(string)
         return json_object
     except Exception as e:
-        return str(("JSON ERROR: ", e))
+        Error = str(("JSON ERROR: ", e))
+    return Error

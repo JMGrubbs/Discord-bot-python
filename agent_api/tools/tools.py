@@ -74,7 +74,7 @@ def run_gpt(input_message):
         print("Working...")
         assistant_response = get_completion(agents.get("assistant_agents")[0], user_proxy_response)
         print("Kirk_assistant_response:", assistant_response)
-        response_json = conver_to_json(str(assistant_response[7:-3]))
+        response_json = conver_to_json(str(assistant_response))
 
         new_file_output = create_run_file(response_json)
 
