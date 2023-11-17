@@ -1,6 +1,5 @@
 from openai import OpenAI
 import time
-import json
 
 # from getpass import getpass
 from openai_tools import (
@@ -30,7 +29,12 @@ agents = {
         "proxy_agent_thread": None,
         "metadata": {
             "role": "user",
-            "instructions": """As a user proxy agent, your responsibility is to streamline the dialogue between the user and specialized agents within this group chat. Your duty is to articulate user requests accurately to the relevant agents and maintain ongoing communication with them to guarantee the user's task is carried out to completion. Please do not respond to the user until the task is complete, an error has been reported by the relevant agent, or you are certain of your response.""",
+            "instructions": """Instructions:
+                1. Create completion standards for a the coding coding task given to you.
+                2. Give completion stadards for the coding task to the assitsant coding agent to use when writing code.
+                3. If the new file exucuted works as intended return "success" otherwise return reiterate and improved instructions for the assitsant coding agent
+                4. Do not try to accomplish this task yourself. You are only to give instructions to the assitant coding agent.
+            """,
         },
     },
     "assistant_agents": [
@@ -41,26 +45,54 @@ agents = {
             "thread": None,
             "metadata": {
                 "role": "user",
-                "instructions": "As a top-tier programming AI, you are adept at creating accurate Python scripts. You will properly name files and craft precise Python code with the appropriate imports to fulfill the user's request. Ensure to execute the necessary code before responding to the user.",
+                "instructions": """Instructions:
+                    1. Responsed with ONLY a valid json object in the form of a string "{object}"
+                    2. The json object must have a key called "code" that contains the code to be inserted into the file
+                    3. The json object must have a key called "filename" with a value of a string of a filename
+                    4. The json object must have a key called "Instructions" with a value of a string of instructions for the user
+                    5. The python code must print "Hello world"
+
+                The JSON object can have any number of key value pairs but must include the 3 keys above. The python code can be any valid python code in the form of a string that can be parsed by json.loads(). The filename can be any valid filename in string format. The instructions can be any valid string.
+                Example response: "{"code": "print('Hello world')", "filename": "hello.py", "Instructions": "print hello world"}" """,
             },
         },
     ],
 }
 
 
-def get_completion(proxy_agent, input_message):
+def run_gpt(input_message):
     input_message = input_message.lower()
     if input_message == "exit":
         print("Goodbye.")
         quit()
 
+    user_proxy_response = get_completion(agents.get("proxy_agent"), input_message)
+    print("Naeblis_user_proxy: ", user_proxy_response)
+    new_file_output = None
+    working = True
+    while working:
+        print("Working...")
+        assistant_response = get_completion(agents.get("assistant_agents")[0], user_proxy_response)
+        print("Kirk_assistant_response:", assistant_response)
+        response_json = conver_to_json(str(assistant_response[7:-3]))
+
+        new_file_output = create_run_file(response_json)
+
+        user_proxy_response = get_completion(agents.get("proxy_agent"), str(new_file_output))
+        if "success" in str(user_proxy_response).lower():
+            working = False
+
+    print("Success")
+    print(user_proxy_response)
+    run_gpt(input("Ready for next task: "))
+
+
+def get_completion(proxy_agent, input_message):
     if proxy_agent.get("user_proxy_thread") is None:
         proxy_agent["user_proxy_thread"] = create_gpt_thread(client)
 
     create_gpt_prompt(client, proxy_agent["user_proxy_thread"].id, input_message)
-    run_gpt = create_gpt_run(
-        client, proxy_agent["user_proxy_thread"].id, proxy_agent["assistant_id"]
-    )
+    run_gpt = create_gpt_run(client, proxy_agent["user_proxy_thread"].id, proxy_agent)
     tries = 0
     while run_gpt.status != "completed" and run_gpt.status != "failed":
         time.sleep(3)
@@ -73,18 +105,8 @@ def get_completion(proxy_agent, input_message):
             print(run_gpt)
             break
 
-    response = get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
-    print(response)
-    try:
-        response = conver_to_json(str(response[7:-3]))
-    except Exception as e:
-        print(e)
-
-    new_file_output = create_run_file(response)
-    print(new_file_output)
-
-    get_completion(proxy_agent, input("Enter a message: "))
+    return get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
 
 
 if __name__ == "__main__":
-    get_completion(agents.get("proxy_agent"), input("Enter a message: "))
+    run_gpt(input("Enter a message: "))
