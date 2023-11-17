@@ -1,7 +1,6 @@
 from openai import OpenAI
 import time
-
-# import json
+import json
 
 # from getpass import getpass
 from openai_tools import (
@@ -11,7 +10,8 @@ from openai_tools import (
     retrieve_gpt_run,
     get_gpt_prompt_response,
     cancel_gpt_run,
-    # create_file,
+    conver_to_json,
+    create_run_file,
 )
 import toml
 
@@ -52,7 +52,7 @@ def get_completion(proxy_agent, input_message):
     input_message = input_message.lower()
     if input_message == "exit":
         print("Goodbye.")
-        return False
+        quit()
 
     if proxy_agent.get("user_proxy_thread") is None:
         proxy_agent["user_proxy_thread"] = create_gpt_thread(client)
@@ -62,22 +62,29 @@ def get_completion(proxy_agent, input_message):
         client, proxy_agent["user_proxy_thread"].id, proxy_agent["assistant_id"]
     )
     tries = 0
-    while run_gpt.status != "completed" or run_gpt.status != "cancelled":
-        if tries > 5:
-            print("Error: GPT run took too long.")
-            run_gpt = cancel_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+    while run_gpt.status != "completed" and run_gpt.status != "failed":
         time.sleep(3)
+        tries += 1
         run_gpt = retrieve_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
         print(run_gpt.status)
-        tries += 1
+        if tries > 25:
+            print("Error: GPT run took too long.")
+            run_gpt = cancel_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+            print(run_gpt)
+            break
 
     response = get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
     print(response)
-    # response = jsonify(response)
-    # create_file("./creations" + , response, "./creations")
+    try:
+        response = conver_to_json(str(response[7:-3]))
+    except Exception as e:
+        print(e)
+
+    new_file_output = create_run_file(response)
+    print(new_file_output)
+
     get_completion(proxy_agent, input("Enter a message: "))
 
 
 if __name__ == "__main__":
-    while True:
-        get_completion(agents.get("proxy_agent"), input("Enter a message: "))
+    get_completion(agents.get("proxy_agent"), input("Enter a message: "))
