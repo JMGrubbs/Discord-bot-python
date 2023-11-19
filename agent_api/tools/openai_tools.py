@@ -1,10 +1,6 @@
-# from typing import List
-# from pydantic import Field
-# from instructor import OpenAISchema
-# import subprocess
-# import os
 import json
 import subprocess
+import time
 
 
 def create_gpt_thread(client):
@@ -46,7 +42,9 @@ def cancel_gpt_run(client, thread_id, run_id):
     )
 
 
-def create_run_file(json_object):
+def create_run_file(assistant_response):
+    # converts output to json
+    json_object = conver_to_json(str(assistant_response))
     # Define the code for the new Python script
     new_script_code = json_object.get("code")
 
@@ -66,24 +64,50 @@ def create_run_file(json_object):
     return result.stdout
 
 
-def conver_to_json(string):
+def conver_to_json(assistant_response):
     json_object = None
     Error = None
     try:
-        json_object = json.loads(string[7:-3])
+        json_object = json.loads(assistant_response[9:-3])
+        return json_object
+    except Exception as e:
+        Error = str(("JSON ERROR: ", e))
+    try:
+        json_object = json.loads(assistant_response[7:-3])
         return json_object
     except Exception as e:
         Error = str(("JSON ERROR: ", e))
 
     try:
-        json_object = json.loads(string[3:-3])
+        json_object = json.loads(assistant_response[3:-3])
         return json_object
     except Exception as e:
         Error = str(("JSON ERROR: ", e))
 
     try:
-        json_object = json.loads(string)
+        json_object = json.loads(assistant_response)
         return json_object
     except Exception as e:
         Error = str(("JSON ERROR: ", e))
     return Error
+
+
+def get_completion(client, proxy_agent, input_message):
+    if proxy_agent.get("user_proxy_thread") is None:
+        proxy_agent["user_proxy_thread"] = create_gpt_thread(client)
+
+    create_gpt_prompt(client, proxy_agent["user_proxy_thread"].id, input_message)
+    run_gpt = create_gpt_run(client, proxy_agent["user_proxy_thread"].id, proxy_agent)
+    tries = 0
+    while run_gpt.status != "completed" and run_gpt.status != "failed":
+        time.sleep(3)
+        tries += 1
+        run_gpt = retrieve_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+        print(run_gpt.status)
+        if tries > 25:
+            print("Error: GPT run took too long.")
+            run_gpt = cancel_gpt_run(client, proxy_agent["user_proxy_thread"].id, run_gpt.id)
+            print(run_gpt)
+            break
+
+    return get_gpt_prompt_response(client, proxy_agent["user_proxy_thread"].id)
