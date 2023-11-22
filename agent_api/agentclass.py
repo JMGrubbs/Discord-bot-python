@@ -1,93 +1,101 @@
-from openai import OpenAI
 import time
-import toml
+from pydantic import BaseModel
 
 
-class Agents:
-    def __init__(self, assistant_id) -> None:
-        self.gpt_assistant_id = assistant_id
-        self.gpt_current_thread = None
-        self.gpt_latest_input_prompt = None
-        self.gpt_latest_prompt_response = None
-        self.gpt_run = None
+class Agents(BaseModel):
+    agentName: str
+    agentID: str
+    model: str
+    instructions: str
+    currentThread: str = None
+    currentMessage: str = None
+    currentPrompt: str = None
+    currentPromptResponse: str = None
+    currentRunId: str = None
+    runstatus: str = None
 
-        self.gpt_api_key = toml.load("api_config.toml")["openai"]["api_key"]
-        self.gpt_client = OpenAI(
-            api_key=self.gpt_api_key,
-        )
+    def __pydantic_fields_set__(self, agentID, model, instructions, agentName):
+        self.agentID = agentID
+        self.model = model
+        self.instructions = instructions
+        self.agentName = agentName
 
-    # Thread functions -----------------------------
-    # This function creates a new thread using the openAI API
-    def create_gpt_thread(self):
-        return self.gpt_client.beta.threads.create()
+    def getAgentID(self):
+        return self.agentID
 
-    # This function gets the current thread
-    def get_thread(self):
-        if self.gpt_current_thread is None:
-            self.gpt_current_thread = self.create_gpt_thread()
-        return self.gpt_current_thread
+    # ----------------------- Thread Functions -----------------------
+    def getCurrentThread(self):
+        return self.currentThread
 
-    # Client functions -----------------------------
-    # The function creates a new client using the openAI API
-    def create_new_gpt_client(self):
-        self.gpt_client = OpenAI(
-            api_key=self.gpt_api_key,
-        )
+    def createNewThread(self, client):
+        return client.beta.threads.create().id
 
-    # This function gets the current client
-    def get_gpt_client(self):
-        if self.gpt_client is None:
-            self.create_new_gpt_client()
-        return self.gpt_client
-
-    # Prompt functions ----------------------------
-    # This function creates a new prompt and adds it to the current thread
-    def create_gpt_prompt(self, input_message):
-        return self.gpt_client.beta.threads.messages.create(
-            thread_id=self.gpt_current_thread.id,
+    # ----------------------- Prompt Functions -----------------------
+    def createNewMessage(self, client):
+        return client.beta.threads.messages.create(
+            thread_id=self.currentThread,
             role="user",
-            content=input_message,
+            content=self.currentPrompt,
         )
 
-    # This function gets the newest input prompt added to the thread
-    def get_gpt_latest_prompt(self):
-        if self.gpt_latest_input_prompt is None:
-            self.gpt_latest_input_prompt = "Ask a question."
-        return self.gpt_latest_input_prompt
-
-    # Run functions ----------------------------
-    # This function runs the current thread after a message has been created and added to the thread
-    def create_gpt_run(self):
-        return self.gpt_client.beta.threads.runs.create(
-            thread_id=self.gpt_current_thread.id,
-            assistant_id=self.gpt_assistant_id,
-            instructions="Adhear to the given instructions.",
-        )
-
-    # This function gets the latest run from the current thread
-    def run_gpt_prompt(self):
-        # if self.gpt_run is None:
-        self.gpt_run = self.create_gpt_run()
-
-        completed = False
-        while completed is False:
-            run_status = self.gpt_client.beta.threads.runs.retrieve(
-                thread_id=self.gpt_current_thread.id, run_id=self.gpt_run.id
-            )
-            if run_status.status == "completed":
-                completed = True
-            time.sleep(1)  # sleep to avoid hitting the API too frequently
-
-    # Response functions ----------------------------
-    # This function gets the latest response from the current thread
-    def set_gpt_latest_response(self):
-        self.gpt_latest_prompt_response = (
-            self.gpt_client.beta.threads.messages.list(thread_id=self.gpt_current_thread.id)
+    def getMostRecentResponse(self, client):
+        return (
+            client.beta.threads.messages.list(thread_id=self.currentThread)
             .data[0]
             .content[0]
             .text.value
         )
 
-    # This function gets the latest response from chatGPT agent in the current thread
-    def get_gpt_latest_response(self):
-        return self.gpt_latest_prompt_response
+    def retrieveRun(self, client):
+        return client.beta.threads.runs.retrieve(
+            thread_id=self.currentThread,
+            run_id=self.currentRunId,
+        )
+
+    # ----------------------- Run Functions -----------------------
+    def createNewRun(self, client):
+        return client.beta.threads.runs.create(
+            thread_id=self.currentThread,
+            assistant_id=self.agentID,
+            model=self.model,
+            instructions=self.instructions,
+        )
+
+    def getRun(self, client):
+        return client.beta.threads.runs.retrieve(
+            thread_id=self.currentThread,
+            run_id=self.currentRunId,
+        )
+
+    def cancelRun(self, client):
+        return client.beta.threads.runs.cancel(
+            thread_id=self.currentThread,
+            run_id=self.currentRunId,
+        )
+
+    # ----------------------- Action Functions -----------------------
+    def get_completion(self, client, input_message, newThread=False):
+        self.currentPrompt = input_message.lower()
+        if self.currentThread is None or newThread is True:
+            self.currentThread = self.createNewThread(client)
+
+        self.currentMessage = self.createNewMessage(client)
+
+        if self.currentRunId is None:
+            self.currentRunId = self.createNewRun(client).id
+
+        tries = 0
+        while self.runstatus != "completed" and self.runstatus != "failed":
+            self.runstatus = self.retrieveRun(client).status
+            print(f"{self.agentName} run status: ", self.runstatus)
+            if tries > 25:
+                print("Error: GPT run took too long.")
+                cancelRun = self.cancelRun(client)
+                print(cancelRun.status)
+                break
+            time.sleep(3)
+            tries += 1
+
+        self.currentPromptResponse = self.getMostRecentResponse(client)
+
+        return self.currentPromptResponse

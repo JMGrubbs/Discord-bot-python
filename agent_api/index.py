@@ -1,5 +1,5 @@
 from openai import OpenAI
-import agentClassv2
+import AgentClass
 
 # from getpass import getpass
 # from openai_tools import (
@@ -57,23 +57,19 @@ agents = {
     ],
 }
 model = "gpt-3.5-turbo-1106"
-proxy_agent_naeblis = agentClassv2.Agents(
+proxy_agent_naeblis = AgentClass.Agents(
     agentName=agents.get("proxy_agent").get("name"),
     instructions=agents.get("proxy_agent").get("metadata").get("instructions"),
     agentID=agents.get("proxy_agent").get("assistant_id"),
     model=model,
 )
 
-assistant_agent = agentClassv2.Agents(
+assistant_agent = AgentClass.Agents(
     agentName=agents.get("assistant_agents")[0].get("name"),
     instructions=agents.get("assistant_agents")[0].get("metadata").get("instructions"),
     agentID=agents.get("assistant_agents")[0].get("assistant_id"),
     model=model,
 )
-
-print(proxy_agent_naeblis.getAgentID())
-
-quit()
 
 
 def runGPT(input_message):
@@ -82,7 +78,9 @@ def runGPT(input_message):
         print("Goodbye.")
         quit()
 
-    proxy_agent_naeblis.get_completion(client, input_message)
+    response = proxy_agent_naeblis.get_completion(client, input_message)
+    print(response)
+    runGPT(input("Enter a message: "))
 
 
 if __name__ == "__main__":
