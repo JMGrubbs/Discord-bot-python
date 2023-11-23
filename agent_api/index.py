@@ -102,11 +102,24 @@ def createNewScript(json_object):
     with open("tools/creations/" + filename, "w") as file:
         file.write(new_script_code)
 
-    result = subprocess.run(
-        ["python", "tools/creations/" + filename], capture_output=True, text=True
-    )
-    # Return the output of the script
-    return result.stdout
+    # result = subprocess.run(
+    #     ["python", "tools/creations/" + filename], capture_output=True, text=True
+    # )
+    # # Return the output of the script
+    # return result.stdout
+    return "tools/creations/" + filename
+
+
+def read_file(file_path):
+    try:
+        with open(file_path, "r") as file:
+            file_contents = file.read()
+            print("File Contents:")
+            print(file_contents)
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 
 def runGPT(input_message):
@@ -122,23 +135,24 @@ def runGPT(input_message):
         assistant_agent_response = assistant_agent.get_completion(client, user_proxy_response)
         print("Kirk_assistant_response:", assistant_agent_response)
 
-        file_output = None
+        json_object = None
+        new_file = None
         try:
             json_object = getjson(assistant_agent_response)
             print("json_object: ", json_object)
-            file_output = createNewScript(json_object)
+            NewFIle = createNewScript(json_object)
         except Exception as e:
             print("Error: ", e)
-            file_output = e
+            NewFIle = e
 
-        print("file_output: ", file_output)
+        print("NewFIle: ", NewFIle)
+        test_output = proxy_agent_naeblis.run_scripts(json_object=json_object, client=client)
 
         completion_object = {
-            "new_code_output": file_output,
+            "new_code_output": test_output,
             "assistant_response": assistant_agent_response,
         }
 
-        print(completion_object)
         user_proxy_response = proxy_agent_naeblis.get_completion(client, str(completion_object))
         user_proxy_response = getjson(user_proxy_response)
         print("Naeblis_user_proxy: ", user_proxy_response)
