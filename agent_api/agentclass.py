@@ -81,21 +81,20 @@ class Agents(BaseModel):
 
         self.currentMessage = self.createNewMessage(client)
 
-        if self.currentRunId is None:
-            self.currentRunId = self.createNewRun(client).id
+        self.currentRunId = self.createNewRun(client).id
 
         tries = 0
+        self.runstatus = None
         while self.runstatus != "completed" and self.runstatus != "failed":
             self.runstatus = self.retrieveRun(client).status
             print(f"{self.agentName} run status: ", self.runstatus)
-            if tries > 25:
+            if tries > 10:
                 print("Error: GPT run took too long.")
                 cancelRun = self.cancelRun(client)
-                print(cancelRun.status)
+                print("Canceled run: ", cancelRun.status)
                 break
-            time.sleep(3)
             tries += 1
-
+            time.sleep(3)
         self.currentPromptResponse = self.getMostRecentResponse(client)
 
         return self.currentPromptResponse
