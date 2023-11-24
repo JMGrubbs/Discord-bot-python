@@ -1,7 +1,6 @@
-import subprocess
-import json
 from openai import OpenAI
 import AgentClass
+import AgentToolsClass
 
 # from getpass import getpass
 # from openai_tools import (
@@ -73,53 +72,9 @@ assistant_agent = AgentClass.Agents(
     model=model,
 )
 
-
-def getjson(string):
-    json_object = None
-    Error = None
-    try:
-        json_object = json.loads(string[7:-3])
-        return json_object
-    except Exception as e:
-        Error = str(("JSON ERROR: ", e))
-
-    try:
-        json_object = json.loads(string)
-        return json_object
-    except Exception as e:
-        Error = str(("JSON ERROR: ", e))
-    return Error
-
-
-def createNewScript(json_object):
-    # Define the code for the new Python script
-    new_script_code = json_object.get("code")
-
-    # Define the filename for the new Python script
-    filename = json_object.get("filename")
-
-    # Create the new Python script file with the provided code
-    with open("tools/creations/" + filename, "w") as file:
-        file.write(new_script_code)
-
-    # result = subprocess.run(
-    #     ["python", "tools/creations/" + filename], capture_output=True, text=True
-    # )
-    # # Return the output of the script
-    # return result.stdout
-    return "tools/creations/" + filename
-
-
-def read_file(file_path):
-    try:
-        with open(file_path, "r") as file:
-            file_contents = file.read()
-            print("File Contents:")
-            print(file_contents)
-    except FileNotFoundError:
-        print(f"File not found: {file_path}")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+agent_tools = AgentToolsClass.AgentTools(
+    workspace="agent_api/tools/workspace/", creations="agent_api/tools/agent_tools"
+)
 
 
 def runGPT(input_message):
@@ -132,29 +87,24 @@ def runGPT(input_message):
     print("Naeblis_user_proxy: ", user_proxy_response)
     while True:
         print("Working...")
+        # the below code is for creating a new script based on the output of the assistant agent
         assistant_agent_response = assistant_agent.get_completion(client, user_proxy_response)
         print("Kirk_assistant_response:", assistant_agent_response)
+        json_object = agent_tools.getjson(assistant_agent_response)
+        print("json_object: ", json_object)
+        new_file = agent_tools.createNewScript(json_object)
 
-        json_object = None
-        new_file = None
-        try:
-            json_object = getjson(assistant_agent_response)
-            print("json_object: ", json_object)
-            NewFIle = createNewScript(json_object)
-        except Exception as e:
-            print("Error: ", e)
-            NewFIle = e
+        # the code below will alow the user pproxy agent to run code from the newly created script
+        print("new_file: ", new_file)
+        test_output = agent_tools.run_scripts(json_object=json_object, new_file=new_file)
 
-        print("NewFIle: ", NewFIle)
-        test_output = proxy_agent_naeblis.run_scripts(json_object=json_object, client=client)
-
+        # the below code is for checking the output of the newly created script
         completion_object = {
             "new_code_output": test_output,
             "assistant_response": assistant_agent_response,
         }
-
         user_proxy_response = proxy_agent_naeblis.get_completion(client, str(completion_object))
-        user_proxy_response = getjson(user_proxy_response)
+        user_proxy_response = agent_tools.getjson(user_proxy_response)
         print("Naeblis_user_proxy: ", user_proxy_response)
 
         if user_proxy_response.get("completed"):

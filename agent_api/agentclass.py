@@ -98,30 +98,3 @@ class Agents(BaseModel):
         self.currentPromptResponse = self.getMostRecentResponse(client)
 
         return self.currentPromptResponse
-
-    def write_to_file(file_path, content):
-        try:
-            with open(file_path, "w") as file:
-                file.write(content)
-            print(f"Successfully wrote content to {file_path}")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-    def read_file(self, file_path):
-        try:
-            with open(file_path, "r") as file:
-                file_contents = file.read()
-                print("File Contents:")
-                print(file_contents)
-        except FileNotFoundError:
-            print(f"File not found: {file_path}")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-    def run_scripts(self, json_object, client):
-        testing_file = self.read_file("agent_api/tools/agent_work_dir/testing.py")
-
-        self.get_completion(client, str(json_object))
-
-        self.write_to_file("agent_api/tools/agent_work_dir/testing.py", json_object)
-        return testing_file
