@@ -5,11 +5,11 @@ import json
 
 class AgentTools(BaseModel):
     workspace: str
-    creations: str
+    tools: str
 
-    def __pydantic_fields_set__(self, workspace, creations):
+    def __pydantic_fields_set__(self, workspace, tools):
         self.workspace = workspace
-        self.creations = creations
+        self.tools = tools
 
     def getjson(string):
         json_object = None
@@ -46,7 +46,7 @@ class AgentTools(BaseModel):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-    def createNewScript(json_object):
+    def createNewScript(self, json_object):
         # Define the code for the new Python script
         new_script_code = json_object.get("code")
 
@@ -54,14 +54,22 @@ class AgentTools(BaseModel):
         filename = json_object.get("filename")
 
         # Create the new Python script file with the provided code
-        with open("tools/creations/" + filename, "w") as file:
+        with open(self.tools + filename, "w") as file:
             file.write(new_script_code)
+        return
 
-        return "tools/creations/" + filename
-
-    def run_scripts(self, json_object):
+    def run_tool(self, filename):
         result = subprocess.run(
-            ["python", "tools/creations/" + json_object.get("filename")],
+            ["python", self.tools + filename],
+            capture_output=True,
+            text=True,
+        )
+        # Return the output of the script
+        return result.stdout
+
+    def run_scripts(self):
+        result = subprocess.run(
+            ["python", self.workspace + "testing.py"],
             capture_output=True,
             text=True,
         )

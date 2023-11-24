@@ -1,19 +1,14 @@
 from openai import OpenAI
 import AgentClass
 import AgentToolsClass
-
-# from getpass import getpass
-# from openai_tools import (
-#     create_run_file,
-#     get_completion,
-# )
 import toml
 
 OPENAI_API_KEY = toml.load("api_config.toml")["openai"]["api_key"]
 client = client = OpenAI(
     api_key=OPENAI_API_KEY,
 )
-# Dictionary to hold multiple agents, keyed by assistant_id
+
+# agents dicunaary to hold multiple agents, keyed by assistant_id
 agents = {
     "proxy_agent": {
         "name": "Naeblis",
@@ -57,6 +52,8 @@ agents = {
         },
     ],
 }
+
+# runtime setup
 model = "gpt-3.5-turbo-1106"
 proxy_agent_naeblis = AgentClass.Agents(
     agentName=agents.get("proxy_agent").get("name"),
@@ -73,7 +70,7 @@ assistant_agent = AgentClass.Agents(
 )
 
 agent_tools = AgentToolsClass.AgentTools(
-    workspace="agent_api/tools/workspace/", creations="agent_api/tools/agent_tools"
+    workspace="agent_api/tools/agent_workspace/", creations="agent_api/tools/agent_tools/"
 )
 
 
@@ -87,16 +84,18 @@ def runGPT(input_message):
     print("Naeblis_user_proxy: ", user_proxy_response)
     while True:
         print("Working...")
-        # the below code is for creating a new script based on the output of the assistant agent
+        # the below code is gets coding assistants response to the user proxy agents prompt
         assistant_agent_response = assistant_agent.get_completion(client, user_proxy_response)
         print("Kirk_assistant_response:", assistant_agent_response)
+
+        # the below code is for creating a new script from the coding assistants response
         json_object = agent_tools.getjson(assistant_agent_response)
         print("json_object: ", json_object)
         new_file = agent_tools.createNewScript(json_object)
 
-        # the code below will alow the user pproxy agent to run code from the newly created script
+        # the code below will alow the user proxy agent to run code from the newly created script
         print("new_file: ", new_file)
-        test_output = agent_tools.run_scripts(json_object=json_object, new_file=new_file)
+        test_output = agent_tools.run_scripts(json_object=json_object)
 
         # the below code is for checking the output of the newly created script
         completion_object = {

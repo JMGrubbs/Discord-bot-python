@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import toml
-from tools.tools import run_gpt
+from index import runGPT
 
 # import json
 API_KEY = toml.load("api_config.toml")["agent_api"]["api_key"]
@@ -19,7 +19,7 @@ def send_prompt():
         return jsonify({"error": "Assistant ID and message are required"}), 400
 
     try:
-        response = run_gpt(input_message)
+        response = runGPT(input_message)
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
