@@ -11,23 +11,21 @@ class AgentTools(BaseModel):
         self.workspace = workspace
         self.tools = tools
 
-    def getjson(string):
-        json_object = None
-        Error = None
+    def getjson(self, json_object_string):
         try:
-            json_object = json.loads(string[7:-3])
+            json_object = json.loads(json_object_string[7:-3])
             return json_object
         except Exception as e:
             Error = str(("JSON ERROR: ", e))
 
         try:
-            json_object = json.loads(string)
+            json_object = json.loads(json_object_string)
             return json_object
         except Exception as e:
             Error = str(("JSON ERROR: ", e))
         return Error
 
-    def write_to_file(file_path, content):
+    def write_to_file(self, file_path, content):
         try:
             with open(file_path, "w") as file:
                 file.write(content)
@@ -75,3 +73,10 @@ class AgentTools(BaseModel):
         )
         # Return the output of the script
         return result.stdout
+
+    def test_new_script(self, json_object):
+        # Define the filename for the new Python script
+        filename = json_object.get("filename")
+
+        self.write
+        return

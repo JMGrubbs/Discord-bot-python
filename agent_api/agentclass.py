@@ -91,8 +91,8 @@ class Agents(BaseModel):
             if tries > 10:
                 print("Error: GPT run took too long.")
                 cancelRun = self.cancelRun(client)
-                print("Canceled run: ", cancelRun.status)
-                break
+                print("Canceled run: ", cancelRun)
+                quit()
             tries += 1
             time.sleep(3)
         self.currentPromptResponse = self.getMostRecentResponse(client)

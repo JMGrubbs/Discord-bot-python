@@ -14,8 +14,6 @@ agents = {
         "name": "Naeblis",
         "assistant_id": toml.load("api_config.toml")["openai"]["naeblis"],
         "working": False,
-        "user_proxy_thread": None,
-        "proxy_agent_thread": None,
         "metadata": {
             "role": "user",
             "instructions": """
@@ -30,15 +28,12 @@ agents = {
                 """,
         },
     },
-    "assistant_agents": [
-        {
-            "name": "Kirk",
-            "assistant_id": toml.load("api_config.toml")["openai"]["kirk"],
-            "working": False,
-            "thread": None,
-            "metadata": {
-                "role": "user",
-                "instructions": """
+    "assistant_agents": {
+        "name": "Kirk",
+        "assistant_id": toml.load("api_config.toml")["openai"]["kirk"],
+        "metadata": {
+            "role": "user",
+            "instructions": """
                     Instructions:
                         1. Your response must be in the form of a json object
                         2. The json object must have a key called "code" that contains the code to be inserted into the file
@@ -48,9 +43,24 @@ agents = {
                     The JSON object can have any number of key value pairs but must include the 3 keys above. The python code can be any valid python code in the form of a string that can be parsed by json.loads(). The filename can be any valid filename in string format. The instructions can be any valid string.
                     Example response: "{"code": "print('Hello world')", "filename": "hello.py", "Instructions": "print hello world"}"
                 """,
-            },
         },
-    ],
+    },
+    "testing_agents": {
+        "name": "Alexander",
+        "assistant_id": toml.load("api_config.toml")["openai"]["alexander"],
+        "metadata": {
+            "role": "user",
+            "instructions": """
+                You are a code testing agent. When called you need to write a test for the code that the assistant agent creates.
+                Instructions:
+                    1. Create a test for the code that the assistant agent creates.
+                    2. You will import the script that the assistant agent creates, call the function and return the output.
+                    3. You will return the output of the test in the form of a json object with the following keys: "output" as a string of the output of the test
+                    4. you will be given a json object with the code and with the code and file name you need to write the test for
+                    5. Responed with only a json object
+            """,
+        },
+    },
 }
 
 # runtime setup
@@ -63,14 +73,21 @@ proxy_agent_naeblis = AgentClass.Agents(
 )
 
 assistant_agent = AgentClass.Agents(
-    agentName=agents.get("assistant_agents")[0].get("name"),
-    instructions=agents.get("assistant_agents")[0].get("metadata").get("instructions"),
-    agentID=agents.get("assistant_agents")[0].get("assistant_id"),
+    agentName=agents.get("assistant_agents").get("name"),
+    instructions=agents.get("assistant_agents").get("metadata").get("instructions"),
+    agentID=agents.get("assistant_agents").get("assistant_id"),
+    model=model,
+)
+
+tesing_agent = AgentClass.Agents(
+    agentName=agents.get("testing_agents").get("name"),
+    instructions=agents.get("testing_agents").get("metadata").get("instructions"),
+    agentID=agents.get("testing_agents").get("assistant_id"),
     model=model,
 )
 
 agent_tools = AgentToolsClass.AgentTools(
-    workspace="agent_api/tools/agent_workspace/", creations="agent_api/tools/agent_tools/"
+    workspace="tools/agent_workspace/", tools="tools/agent_tools/"
 )
 
 
@@ -89,21 +106,28 @@ def runGPT(input_message):
         print("Kirk_assistant_response:", assistant_agent_response)
 
         # the below code is for creating a new script from the coding assistants response
-        json_object = agent_tools.getjson(assistant_agent_response)
+        json_object = agent_tools.getjson(json_object_string=assistant_agent_response)
         print("json_object: ", json_object)
-        new_file = agent_tools.createNewScript(json_object)
+        agent_tools.createNewScript(json_object)
 
         # the code below will alow the user proxy agent to run code from the newly created script
-        print("new_file: ", new_file)
-        test_output = agent_tools.run_scripts(json_object=json_object)
 
-        # the below code is for checking the output of the newly created script
+        testing_agent_response = tesing_agent.get_completion(client, str(json_object))
+        print("Alexander_tester_response:", testing_agent_response)
+        json_object = agent_tools.getjson(json_object_string=assistant_agent_response)
+        print("Alexander_json_object: ", json_object)
+        test_script = agent_tools.createNewScript(json_object)
+
+        test_script_output = agent_tools.run_scripts(json_object=test_script.get("filename"))
+        print("test_script_output: ", test_script_output)
+        quit()
+        # the below code is for checking the output of the newly created script and checking if it works as intented.
         completion_object = {
-            "new_code_output": test_output,
-            "assistant_response": assistant_agent_response,
+            "new_code_output": test_script_output,
+            "assistant_response": json_object,
         }
         user_proxy_response = proxy_agent_naeblis.get_completion(client, str(completion_object))
-        user_proxy_response = agent_tools.getjson(user_proxy_response)
+        user_proxy_response = agent_tools.getjson(json_object_string=user_proxy_response)
         print("Naeblis_user_proxy: ", user_proxy_response)
 
         if user_proxy_response.get("completed"):
