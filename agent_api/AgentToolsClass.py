@@ -65,18 +65,11 @@ class AgentTools(BaseModel):
         # Return the output of the script
         return result.stdout
 
-    def run_scripts(self):
+    def run_scripts(self, filename):
         result = subprocess.run(
-            ["python", self.workspace + "testing.py"],
+            ["python", self.tools + filename],
             capture_output=True,
             text=True,
         )
         # Return the output of the script
         return result.stdout
-
-    def test_new_script(self, json_object):
-        # Define the filename for the new Python script
-        filename = json_object.get("filename")
-
-        self.write
-        return

@@ -52,11 +52,14 @@ agents = {
             "role": "user",
             "instructions": """
                 You are a code testing agent. When called you need to write a test for the code that the assistant agent creates.
+                As a top-tier programming AI, you are adept at creating accurate Python scripts. You will properly name files and craft precise Python code with the appropriate imports to fulfill the user's request. Ensure to execute the necessary code before responding to the user.
+
+                You are a code-testing agent. When called you need to write and return a python script that tests the code that the assistant agent created.
                 Instructions:
-                    1. Create a test for the code that the assistant agent creates.
-                    2. You will import the script that the assistant agent creates, call the function and return the output.
-                    3. You will return the output of the test in the form of a json object with the following keys: "output" as a string of the output of the test
-                    4. you will be given a json object with the code and with the code and file name you need to write the test for
+                    1. Create a test file using the file name from the assistant.
+                    2. Imort the script and the function from the script that the assistant created.
+                    3. Return the output of the test in the form of a json object with the following keys: "output" as a string of the output of the test
+                    4. You will be given a the script in the form of a string
                     5. Responed with only a json object
             """,
         },
@@ -110,17 +113,8 @@ def runGPT(input_message):
         print("json_object: ", json_object)
         agent_tools.createNewScript(json_object)
 
-        # the code below will alow the user proxy agent to run code from the newly created script
-
-        testing_agent_response = tesing_agent.get_completion(client, str(json_object))
-        print("Alexander_tester_response:", testing_agent_response)
-        json_object = agent_tools.getjson(json_object_string=assistant_agent_response)
-        print("Alexander_json_object: ", json_object)
-        test_script = agent_tools.createNewScript(json_object)
-
-        test_script_output = agent_tools.run_scripts(json_object=test_script.get("filename"))
+        test_script_output = agent_tools.run_scripts(filename=json_object.get("filename"))
         print("test_script_output: ", test_script_output)
-        quit()
         # the below code is for checking the output of the newly created script and checking if it works as intented.
         completion_object = {
             "new_code_output": test_script_output,
