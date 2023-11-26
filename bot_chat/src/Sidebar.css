@@ -1,0 +1,14 @@
+/* src/Sidebar.css */
+.sidebar {
+    width: 250px;
+    color: #000000;
+    padding: 20px;
+    height: 100%;
+    position: fill;
+    top: 60px;
+    left: 0;
+  }
+
+  .sidebar h2 {
+    margin-bottom: 20px;
+  }
