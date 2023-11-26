@@ -4,7 +4,7 @@
     color: #000000;
     padding: 20px;
     height: 100%;
-    position: fill;
+    position: flex;
     top: 60px;
     left: 0;
   }

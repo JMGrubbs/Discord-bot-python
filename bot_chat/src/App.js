@@ -10,7 +10,7 @@ function App() {
       <header className="App-header">
         <h1>Simple Autogen Clone ChatApp</h1>
       </header>
-      <main>
+      <main className='app-holder'>
         <Sidebar />
         <ChatApp />
       </main>
