@@ -25,5 +25,11 @@ def send_prompt():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/get_response", methods=["POST"])
+def get_prompt():
+    if request.headers.get("api-key") != API_KEY:
+        return jsonify({"error": "Invalid API key"}), 401
+
+
 if __name__ == "__main__":
     app.run(debug=True)

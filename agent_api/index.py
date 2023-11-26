@@ -82,16 +82,18 @@ assistant_agent = AgentClass.Agents(
     model=model,
 )
 
-tesing_agent = AgentClass.Agents(
-    agentName=agents.get("testing_agents").get("name"),
-    instructions=agents.get("testing_agents").get("metadata").get("instructions"),
-    agentID=agents.get("testing_agents").get("assistant_id"),
-    model=model,
-)
+# tesing_agent = AgentClass.Agents(
+#     agentName=agents.get("testing_agents").get("name"),
+#     instructions=agents.get("testing_agents").get("metadata").get("instructions"),
+#     agentID=agents.get("testing_agents").get("assistant_id"),
+#     model=model,
+# )
 
 agent_tools = AgentToolsClass.AgentTools(
     workspace="tools/agent_workspace/", tools="tools/agent_tools/"
 )
+
+messages = []
 
 
 def runGPT(input_message):
@@ -102,7 +104,8 @@ def runGPT(input_message):
 
     user_proxy_response = proxy_agent_naeblis.get_completion(client, input_message)
     print("Naeblis_user_proxy: ", user_proxy_response)
-    while True:
+    running = True
+    while running:
         print("Working...")
         # the below code is gets coding assistants response to the user proxy agents prompt
         assistant_agent_response = assistant_agent.get_completion(client, user_proxy_response)
@@ -126,12 +129,13 @@ def runGPT(input_message):
 
         if user_proxy_response.get("completed"):
             print("Task is complete.")
-            return user_proxy_response
+            running = False
 
         user_proxy_response = str(user_proxy_response)
 
+    print(user_proxy_response)
+    runGPT(input("Enter Task Instructions: "))
+
 
 if __name__ == "__main__":
-    while True:
-        response = runGPT(input("Enter Task Instructions: "))
-        print(response.get("message_to_user"))
+    response = runGPT(input("Enter Task Instructions: "))
