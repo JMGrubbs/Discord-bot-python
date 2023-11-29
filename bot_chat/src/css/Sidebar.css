@@ -1,0 +1,37 @@
+/* src/Sidebar.css */
+.sidebar {
+    width: 250px;
+    color: #000000;
+    padding: 20px;
+    height: 100%;
+    position: flex;
+    top: 60px;
+    left: 0;
+  }
+
+  .sidebar h2 {
+    margin-bottom: 20px;
+  }
+
+ul {
+  list-style: none; /* Remove default bullet points */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+
+/* Style for list items */
+ul li {
+  padding: 10px 0; /* Add some vertical spacing between list items */
+  border-bottom: 1px solid #ddd; /* Add a horizontal line as a separator */
+}
+
+/* Style for the last list item (removing the border) */
+ul li:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect for list items */
+ul li:hover {
+  background-color: #f0f0f0; /* Change background color on hover */
+  transition: background-color 0.3s; /* Smooth transition effect */
+}
