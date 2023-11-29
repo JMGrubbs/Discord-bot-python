@@ -38,13 +38,20 @@ h1 {
 }
 
 .message {
-  background-color: #007bff;
   color: #fff;
   border-radius: 4px;
   padding: 8px;
   margin-bottom: 8px;
   max-width: 80%;
   word-wrap: break-word;
+}
+
+.message.sender.agent {
+  background-color: #ff0000; /* Red for agent */
+}
+
+.message.sender.user {
+  background-color: #007bff; /* Blue for user */
 }
 
 .message-input {
