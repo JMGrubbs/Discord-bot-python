@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
-import toml
 from index import runGPT
-import redis.redis_cache as redis_cache
+from Redis.redis_cache import get_message, get_all_messages
+
+from env import api_config
 
 # import json
-API_KEY = toml.load("api_config.toml")["agent_api"]["api_key"]
+API_KEY = api_config["agent_api"]["api_key"]
 app = Flask(__name__)
 
 
@@ -31,7 +32,7 @@ def get_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
 
-    return jsonify({"response": redis_cache.get_message(request.json.get("message_id"))})
+    return jsonify({"response": get_message(request.json.get("message_id"))})
 
 
 @app.route("/get_all_responses", methods=["POST"])
@@ -39,7 +40,7 @@ def get_all_responses():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
 
-    return jsonify({"responses": redis_cache.get_all_messages()})
+    return jsonify({"responses": get_all_messages()})
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ agents = {
                 You are a code-testing agent. When called you need to write and return a python script that tests the code that the assistant agent created.
                 Instructions:
                     1. Create a test script for the python script created by the agent using the file name from the assistant.
-                    2. Imort the script and the function from the script that the assistant created.
+                    2. Import the script and the function from the script that the assistant created.
                     3. You will be given a the script in the form of a string
                     4. Return the output of the test in the form of a json object with the following keys: "testCode" as a string
                     5. Responed with only a json object

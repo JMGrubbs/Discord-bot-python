@@ -1,9 +1,10 @@
 from openai import OpenAI
 import AgentClass
 import AgentToolsClass
-import toml
+from env import api_config
 
-OPENAI_API_KEY = toml.load("api_config.toml")["openai"]["api_key"]
+
+OPENAI_API_KEY = api_config["openai"]["api_key"]
 client = client = OpenAI(
     api_key=OPENAI_API_KEY,
 )
@@ -12,7 +13,7 @@ client = client = OpenAI(
 agents = {
     "proxy_agent": {
         "name": "Naeblis",
-        "assistant_id": toml.load("api_config.toml")["openai"]["naeblis"],
+        "assistant_id": api_config["openai"]["naeblis"],
         "working": False,
         "metadata": {
             "role": "user",
@@ -30,7 +31,7 @@ agents = {
     },
     "assistant_agents": {
         "name": "Kirk",
-        "assistant_id": toml.load("api_config.toml")["openai"]["kirk"],
+        "assistant_id": api_config["openai"]["kirk"],
         "metadata": {
             "role": "user",
             "instructions": """
@@ -47,7 +48,7 @@ agents = {
     },
     "testing_agents": {
         "name": "Alexander",
-        "assistant_id": toml.load("api_config.toml")["openai"]["alexander"],
+        "assistant_id": api_config["openai"]["alexander"],
         "metadata": {
             "role": "user",
             "instructions": """
