@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Message from './Message';
+import sendAgentPrompt from '../agentapi/tools.js';
+
 
 function ChatApp() {
     const [messages, setMessages] = useState([]);
@@ -8,11 +10,21 @@ function ChatApp() {
 
     const handleSendMessage = () => {
         if (newMessage) {
-            setMessages([...messages, { text: newMessage, sender: sender }]);
+            setMessages(messages => [...messages, { text: newMessage, sender: sender }]);
+            handleAgentResponse({ "prompt": newMessage });
             setNewMessage('');
         }
     };
 
+    const handleAgentResponse = async (response) => {
+        let json_package = {
+            "message": response,
+            "assistant_id": "Some other data"
+        }
+        response = await sendAgentPrompt(json_package);
+        console.log(response);
+        setMessages(messages => [...messages, { text: response["response"], sender: 'agent' }]);
+    };
 
     return (
         <div className="chat-app">
