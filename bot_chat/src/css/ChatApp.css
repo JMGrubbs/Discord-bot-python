@@ -14,24 +14,21 @@
     height: 500px;
   }
 
-  .message.user {
+  .message {
     border-radius: 4px;
     padding: 8px;
     margin-bottom: 8px;
     max-width: 60%;
     word-wrap: break-word;
     display: block; /* or 'block' if you want each message to be on its own line */
-    text-align: right; /* Align all messages to the right */
+  }
 
+  .message.user {
+    text-align: right; /* Align all messages to the right */
     margin-left: auto; /* Pushes the element to the right */
   }
 
   .message.agent {
-    border-radius: 4px;
-    padding: 8px;
-    margin-bottom: 8px;
-    max-width: 60%; /* Adjust this value as needed */
-    word-wrap: break-word;
     display: block; /* or 'block' if you want each message to be on its own line */
     text-align: left; /* Align all messages to the left */
   }
@@ -46,8 +43,6 @@
     background-color: #1300e3;
     display: inline-block;
   }
-
-
 
   .message-input {
     display: flex;
