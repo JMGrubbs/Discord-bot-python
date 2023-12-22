@@ -6,9 +6,12 @@ function Message({ sender, text }) {
 
     // Apply both `message` and the sender-specific class
     return (
-        <div className={`message sender ${senderClass}`}>
-            {text}
-        </div>
+        <div className={`message ${senderClass}`}>
+            <div className={`message  ${senderClass} holder`}>
+                <div className="message-sender">{sender}</div>
+                <div className="message-text">{text}</div>
+            </div>
+        </div >
     );
 }
 

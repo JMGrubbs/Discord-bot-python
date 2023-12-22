@@ -1,0 +1,75 @@
+.chat-app {
+    width: 800px;
+    margin: 0 auto;
+    margin-top: 30px;
+    position: flex;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .message-list {
+    padding: 30px;
+    overflow-y: scroll;
+    height: 500px;
+  }
+
+  .message.user {
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+    max-width: 60%;
+    word-wrap: break-word;
+    display: block; /* or 'block' if you want each message to be on its own line */
+    text-align: right; /* Align all messages to the right */
+
+    margin-left: auto; /* Pushes the element to the right */
+  }
+
+  .message.agent {
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+    max-width: 60%; /* Adjust this value as needed */
+    word-wrap: break-word;
+    display: block; /* or 'block' if you want each message to be on its own line */
+    text-align: left; /* Align all messages to the left */
+  }
+
+  .message.agent.holder {
+    background-color: #00f756;
+    display: inline-block;
+  }
+
+  .message.user.holder {
+    color:#fff;
+    background-color: #1300e3;
+    display: inline-block;
+  }
+
+
+
+  .message-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    font-size: large;
+  }
+
+  input[type='text'] {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    margin-right: 8px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }

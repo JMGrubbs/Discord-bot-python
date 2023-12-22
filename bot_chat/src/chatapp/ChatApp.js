@@ -22,7 +22,6 @@ function ChatApp() {
             "assistant_id": "Some other data"
         }
         response = await sendAgentPrompt(json_package);
-        console.log(response);
         setMessages(messages => [...messages, { text: response["response"], sender: 'agent' }]);
     };
 
