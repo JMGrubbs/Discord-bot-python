@@ -1,5 +1,5 @@
 from openai import OpenAI
-import AgentClass
+import classes.Agent as Agent
 import toml
 
 OPENAI_API_KEY = toml.load("api_config.toml")["openai"]["api_key"]
@@ -29,7 +29,7 @@ agents = {
 }
 model = "gpt-3.5-turbo-1106"
 
-tesing_agent = AgentClass.Agents(
+tesing_agent = Agent.Agents(
     agentName=agents.get("testing_agents").get("name"),
     instructions=agents.get("testing_agents").get("metadata").get("instructions"),
     agentID=agents.get("testing_agents").get("assistant_id"),
