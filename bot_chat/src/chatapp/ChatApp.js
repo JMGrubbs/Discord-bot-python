@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
 import Message from './Message';
-import sendAgentPrompt from '../agentapi/tools.js';
+import { getMessages, sendMessage } from '../api/messages.js';
 
 
 function ChatApp() {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [sender, setSender] = useState('');
+    const [responseStatus, setResponseStatus] = useState('complete');
 
     const handleSendMessage = () => {
         if (newMessage) {
             setMessages(messages => [...messages, { text: newMessage, sender: sender }]);
-            handleAgentResponse({ "prompt": newMessage });
+            handleAgentResponse(newMessage);
             setNewMessage('');
         }
     };
 
     const handleAgentResponse = async (response) => {
         let json_package = {
-            "message": response,
+            "package_type": "agentprompt",
+            "prompt": response,
             "assistant_id": "Some other data"
         }
-        response = await sendAgentPrompt(json_package);
+        response = await sendMessage(json_package);
+        setResponseStatus(response["status"]);
         setMessages(messages => [...messages, { text: response["response"], sender: 'agent' }]);
     };
 

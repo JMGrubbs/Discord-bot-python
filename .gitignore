@@ -1,3 +1,4 @@
 .venvaiagent
+.venvapi
 *.toml
 *.json
