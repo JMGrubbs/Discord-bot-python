@@ -17,6 +17,20 @@ function ChatApp() {
         }
     };
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function loopWithDelay() {
+        while (responseStatus === 'processing') {
+            getMessages().then((response) => {
+                setResponseStatus(response["status"]);
+                setMessages(messages => [...messages]);
+            });
+            await sleep(3000); // Sleep for 1000 milliseconds (1 second)
+        }
+    }
+
     const handleAgentResponse = async (response) => {
         let json_package = {
             "package_type": "agentprompt",
@@ -25,7 +39,7 @@ function ChatApp() {
         }
         response = await sendMessage(json_package);
         setResponseStatus(response["status"]);
-        setMessages(messages => [...messages, { text: response["response"], sender: 'agent' }]);
+        loopWithDelay();
     };
 
     return (
@@ -34,6 +48,10 @@ function ChatApp() {
                 {messages.map((message, index) => (
                     <Message key={index} text={message.text} sender={message.sender} />
                 ))}
+            </div>
+            <div>
+                {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
+                {responseStatus === 'error' ? <Message text="timed out" sender="agent" /> : null}
             </div>
             <div className="message-input">
                 <input

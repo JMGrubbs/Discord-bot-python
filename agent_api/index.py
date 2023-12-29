@@ -41,21 +41,26 @@ agent_tools = AgentTools.AgentTools(workspace="tools/agent_workspace/", tools="t
 returnPackage = {"messages": [], "file": ""}
 
 
-def addMessage(input_message) -> bool:
+def addMessage(input_message) -> dict:
     try:
         new_text = input_message.lower()
         message = {
-            "author": "user",
+            "sender": "user",
             "timestamp": "now",
             "message": new_text,
             "id": len(returnPackage["messages"]),
         }
         returnPackage["messages"].append(message)
-        return True
+        return {"status": "complete", "response": returnPackage}
     except Exception as e:
         print(e)
-        return False
+        return {"status": "error", "errMessage": e, "response": None}
 
 
 def getMessages() -> dict:
     return returnPackage
+
+
+def deleteMessages() -> dict:
+    returnPackage["messages"] = []
+    return {"status": "complete", "response": returnPackage}

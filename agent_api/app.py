@@ -21,9 +21,9 @@ def send_prompt():
         return jsonify({"error": "package_type is required"}), 400
 
     if package_type == "agentprompt":
-        print("BOOM", data)
-        if addMessage(data["prompt"]):
-            return jsonify({"status": "processing", "response": None}), 200
+        response = addMessage(data["prompt"])
+        if response["status"] != "error":
+            return jsonify(response), 200
         return jsonify({"response": "Error"}), 405
     return jsonify({"error": "Invalid package_type"}), 400
 
@@ -35,12 +35,11 @@ def get_prompt():
     return jsonify({"data": getMessages()}), 200
 
 
-# @app.route("/get_all_responses", methods=["POST"])
-# def get_all_responses():
-#     if request.headers.get("api-key") != API_KEY:
-#         return jsonify({"error": "Invalid API key"}), 401
-
-#     return jsonify({"responses": get_all_messages()})
+@app.route("/deletemessages", methods=["DELETE"])
+def delete_messages():
+    if request.headers.get("api-key") != API_KEY:
+        return jsonify({"error": "Invalid API key"}), 401
+    return jsonify({"data": getMessages()}), 200
 
 
 if __name__ == "__main__":
