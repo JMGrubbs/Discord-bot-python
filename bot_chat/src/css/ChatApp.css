@@ -40,6 +40,7 @@
 
   .message.user.holder {
     color:#fff;
+    font-style: none;
     background-color: #1300e3;
     display: inline-block;
   }

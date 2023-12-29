@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 from index import runGPT
 from Redis.redis_cache import get_message, get_all_messages
+from flask_cors import CORS
 
 from env import api_config
 
 # import json
 API_KEY = api_config["agent_api"]["api_key"]
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/send_prompt", methods=["POST"])
@@ -22,7 +24,8 @@ def send_prompt():
 
     try:
         response = runGPT(input_message)
-        return jsonify({"response": response})
+        # response = "Request received"
+        return jsonify({"response": response}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -31,7 +34,6 @@ def send_prompt():
 def get_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-
     return jsonify({"response": get_message(request.json.get("message_id"))})
 
 
