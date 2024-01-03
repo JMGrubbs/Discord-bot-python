@@ -22,9 +22,7 @@ def send_prompt():
 
     if package_type == "agentprompt":
         response = addMessage(data["prompt"])
-        if response["status"] != "error":
-            return jsonify(response), 200
-        return jsonify({"response": "Error"}), 405
+        return jsonify(response), 200
     return jsonify({"error": "Invalid package_type"}), 400
 
 
@@ -32,14 +30,15 @@ def send_prompt():
 def get_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-    return jsonify({"data": getMessages()}), 200
+    response = getMessages()
+    return jsonify(response), 200
 
 
 @app.route("/deletemessages", methods=["DELETE"])
 def delete_messages():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-    return jsonify({"data": getMessages()}), 200
+    return jsonify(getMessages()), 200
 
 
 if __name__ == "__main__":

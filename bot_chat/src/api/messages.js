@@ -10,11 +10,11 @@ export const sendMessage = async (json_package) => {
             "api-key": apiKey,
         };
         const response = await axios.post(apiUrl + "prompt", json_package, { headers: headers });
-        console.log(response.data["response"]);
-        return response.data["response"];
+        console.log("Response:", response.data["response"]);
+        return { "data": response.data["response"] };
     } catch (error) {
         console.error('Error fetching data:', error);
-        return 'Error Getting response from agent';
+        return { "status": "error", "message": "Error Getting response from agent" };
     }
 };
 
@@ -25,7 +25,7 @@ export const getMessages = async () => {
             "api-key": apiKey,
         };
         const response = await axios.get(apiUrl + "messages", { headers: headers });
-        return response.data;
+        return { "data": response.data["messages"] };
     } catch (error) {
         console.error('Error fetching data:', error);
         return 'Error Getting response from agent';

@@ -11,7 +11,9 @@ function ChatApp() {
 
     const handleSendMessage = () => {
         if (newMessage) {
-            setMessages(messages => [...messages, { text: newMessage, sender: sender }]);
+            let today = new Date();
+            let formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+            setMessages(messages => [...messages, { id: null, timestamp: formattedDate, message: newMessage, sender: sender, status: 'sent' }]);
             handleAgentResponse(newMessage);
             setNewMessage('');
         }
@@ -22,13 +24,19 @@ function ChatApp() {
     }
 
     async function loopWithDelay() {
-        while (responseStatus === 'processing') {
-            getMessages().then((response) => {
-                setResponseStatus(response["status"]);
-                setMessages(messages => [...messages]);
-            });
-            await sleep(3000); // Sleep for 1000 milliseconds (1 second)
-        }
+        getMessages().then(response => {
+            setResponseStatus('complete');
+            setMessages(response["data"]);
+        });
+        // while (responseStatus === 'processing') {
+        //     getMessages().then((response) => {
+        //         console.log("Response:", response["data"]["messages"])
+        //         setResponseStatus('complete');
+        //         setMessages(response["data"]["messages"]);
+        //     });
+        //     console.log("Waiting for response...")
+        //     await sleep(3000); // Sleep for 1000 milliseconds (1 second)
+        // }
     }
 
     const handleAgentResponse = async (response) => {
@@ -38,20 +46,25 @@ function ChatApp() {
             "assistant_id": "Some other data"
         }
         response = await sendMessage(json_package);
-        setResponseStatus(response["status"]);
+        if (response["status"] === "error") {
+            setResponseStatus('error');
+            return;
+        }
+        setResponseStatus('processing');
+        setMessages(response["data"]["messages"]);
         loopWithDelay();
     };
 
     return (
         <div className="chat-app">
             <div className="message-list">
-                {messages.map((message, index) => (
-                    <Message key={index} text={message.text} sender={message.sender} />
+                {messages.map((messageObject, index) => (
+                    <Message key={index} text={messageObject.message} sender={messageObject.sender} />
                 ))}
             </div>
             <div>
                 {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
-                {responseStatus === 'error' ? <Message text="timed out" sender="agent" /> : null}
+                {responseStatus === 'error' ? <Message text="error getting data..." sender="agent" /> : null}
             </div>
             <div className="message-input">
                 <input

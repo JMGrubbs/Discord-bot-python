@@ -1,5 +1,6 @@
 from openai import OpenAI
 import classes.Agent as Agent
+from datetime import datetime
 import classes.AgentTools as AgentTools
 from env import api_config
 from AgentDesc.ProxyAgent import proxy_agent
@@ -38,26 +39,54 @@ assistant_agent = Agent.Agents(
 
 agent_tools = AgentTools.AgentTools(workspace="tools/agent_workspace/", tools="tools/agent_tools/")
 
-returnPackage = {"messages": [], "file": ""}
+returnPackage = {
+    "messages": [],
+    "file": {"fileName": "TestFile", "Content": "print('Hello World')"},
+}
+
+newAgentMessage = {
+    "status": "complete",
+    "sender": "agent",
+    "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+    "message": "Hello, how are you?",
+    "id": len(returnPackage["messages"]),
+}
 
 
 def addMessage(input_message) -> dict:
-    try:
-        new_text = input_message.lower()
-        message = {
-            "sender": "user",
-            "timestamp": "now",
-            "message": new_text,
-            "id": len(returnPackage["messages"]),
-        }
-        returnPackage["messages"].append(message)
-        return {"status": "complete", "response": returnPackage}
-    except Exception as e:
-        print(e)
-        return {"status": "error", "errMessage": e, "response": None}
+    new_text = input_message.lower()
+    message = {
+        "status": "processing",
+        "sender": "user",
+        "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+        "message": new_text,
+        "id": len(returnPackage["messages"]),
+    }
+    returnPackage["messages"].append(message)
+    # agentResponse = createMessageResponse(input_message)
+    # returnPackage["messages"].append(agentResponse)
+    return {"response": returnPackage}
+
+
+# def createMessageResponse(input_message) -> dict:
+#     try:
+#         new_text = input_message.lower()
+#         message = {
+#             "sender": "agent",
+#             "timestamp": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+#             "message": new_text,
+#             "id": len(returnPackage["messages"]),
+#         }
+#         return message
+#     except Exception as e:
+#         print(e)
+#         return {"status": "error", "errMessage": e, "response": None}
 
 
 def getMessages() -> dict:
+    if newAgentMessage["status"] == "complete":
+        returnPackage["messages"][-1]["status"] = "complete"
+        returnPackage["messages"].append(newAgentMessage)
     return returnPackage
 
 
