@@ -24,19 +24,25 @@ function ChatApp() {
     }
 
     async function loopWithDelay() {
-        getMessages().then(response => {
-            setResponseStatus('complete');
-            setMessages(response["data"]);
-        });
-        // while (responseStatus === 'processing') {
-        //     getMessages().then((response) => {
-        //         console.log("Response:", response["data"]["messages"])
-        //         setResponseStatus('complete');
-        //         setMessages(response["data"]["messages"]);
-        //     });
-        //     console.log("Waiting for response...")
-        //     await sleep(3000); // Sleep for 1000 milliseconds (1 second)
-        // }
+        let localResponseStatus = 'processing'; // Local variable for loop control because state is not updated immediately
+
+        while (localResponseStatus === 'processing') {
+            try {
+                const response = await getMessages();
+                const lastStatus = response["data"][response["data"].length - 1]["status"];
+
+                if (lastStatus === "complete") {
+                    localResponseStatus = 'complete'; // Update local variable
+                    setResponseStatus('complete'); // Update state
+                    setMessages(response["data"]); // Update state
+                } else {
+                    await sleep(3000); // Sleep for 3 seconds
+                }
+            } catch (error) {
+                console.error("Error in getting messages:", error);
+                break;
+            }
+        }
     }
 
     const handleAgentResponse = async (response) => {

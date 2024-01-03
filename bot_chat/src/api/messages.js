@@ -10,7 +10,6 @@ export const sendMessage = async (json_package) => {
             "api-key": apiKey,
         };
         const response = await axios.post(apiUrl + "prompt", json_package, { headers: headers });
-        console.log("Response:", response.data["response"]);
         return { "data": response.data["response"] };
     } catch (error) {
         console.error('Error fetching data:', error);
