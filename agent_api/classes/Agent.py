@@ -1,5 +1,12 @@
 import time
 from pydantic import BaseModel
+from openai import OpenAI
+from env import api_config
+
+OPENAI_API_KEY = api_config["openai"]["api_key"]
+CLIENT = OpenAI(
+    api_key=OPENAI_API_KEY,
+)
 
 
 class Agents(BaseModel):
@@ -27,74 +34,84 @@ class Agents(BaseModel):
     def getCurrentThread(self):
         return self.currentThread
 
-    def createNewThread(self, client):
-        return client.beta.threads.create().id
+    def createNewThread(self):
+        print(CLIENT)
+        return CLIENT.beta.threads.create().id
 
     # ----------------------- Prompt Functions -----------------------
-    def createNewMessage(self, client):
-        return client.beta.threads.messages.create(
+    def createNewMessage(self):
+        return CLIENT.beta.threads.messages.create(
             thread_id=self.currentThread,
             role="user",
             content=self.currentPrompt,
         )
 
-    def getMostRecentResponse(self, client):
+    def getResponseFromOpenai(self):
         return (
-            client.beta.threads.messages.list(thread_id=self.currentThread)
+            CLIENT.beta.threads.messages.list(thread_id=self.currentThread)
             .data[0]
             .content[0]
             .text.value
         )
 
-    def retrieveRun(self, client):
-        return client.beta.threads.runs.retrieve(
+    def getCurrentPromptResponse(self):
+        if self.currentPromptResponse is None:
+            return {"error": "No prompt response."}
+        return self.currentPromptResponse
+
+    def clearCurrentPromptResponse(self):
+        self.currentPromptResponse = None
+
+    def retrieveRun(self):
+        return CLIENT.beta.threads.runs.retrieve(
             thread_id=self.currentThread,
             run_id=self.currentRunId,
         )
 
     # ----------------------- Run Functions -----------------------
-    def createNewRun(self, client):
-        return client.beta.threads.runs.create(
+    def createNewRun(self):
+        return CLIENT.beta.threads.runs.create(
             thread_id=self.currentThread,
             assistant_id=self.agentID,
             model=self.model,
             instructions=self.instructions,
         )
 
-    def getRun(self, client):
-        return client.beta.threads.runs.retrieve(
+    def getRun(self):
+        return CLIENT.beta.threads.runs.retrieve(
             thread_id=self.currentThread,
             run_id=self.currentRunId,
         )
 
-    def cancelRun(self, client):
-        return client.beta.threads.runs.cancel(
+    def cancelRun(self):
+        return CLIENT.beta.threads.runs.cancel(
             thread_id=self.currentThread,
             run_id=self.currentRunId,
         )
 
     # ----------------------- Action Functions -----------------------
-    def get_completion(self, client, input_message, newThread=False):
+    def get_completion(self, input_message, newThread=False):
         self.currentPrompt = input_message.lower()
         if self.currentThread is None or newThread is True:
-            self.currentThread = self.createNewThread(client)
+            self.currentThread = self.createNewThread()
 
-        self.currentMessage = self.createNewMessage(client)
+        self.currentMessage = self.createNewMessage()
 
-        self.currentRunId = self.createNewRun(client).id
+        self.currentRunId = self.createNewRun().id
 
         tries = 0
         self.runstatus = None
         while self.runstatus != "completed" and self.runstatus != "failed":
-            self.runstatus = self.retrieveRun(client).status
+            self.runstatus = self.retrieveRun().status
             print(f"{self.agentName} run status: ", self.runstatus)
             if tries > 10:
                 print("Error: GPT run took too long.")
-                cancelRun = self.cancelRun(client)
+                cancelRun = self.cancelRun()
                 print("Canceled run: ", cancelRun)
                 quit()
             tries += 1
-            time.sleep(3)
-        self.currentPromptResponse = self.getMostRecentResponse(client)
+            time.sleep(1)
+
+        self.currentPromptResponse = self.getResponseFromOpenai()
 
         return self.currentPromptResponse

@@ -47,13 +47,13 @@ def runGPT(input_message):
         print("Goodbye.")
         quit()
 
-    user_proxy_response = proxy_agent_naeblis.get_completion(client, input_message)
+    user_proxy_response = proxy_agent_naeblis.get_completion(input_message)
     print("User_proxy: ", user_proxy_response)
     running = True
     while running:
         print("Working...")
         # the below code is gets coding assistants response to the user proxy agents prompt
-        assistant_agent_response = assistant_agent.get_completion(client, user_proxy_response)
+        assistant_agent_response = assistant_agent.get_completion(user_proxy_response)
         print("Assistant_response:", assistant_agent_response)
 
         # the below code is for creating a new script from the coding assistants response
@@ -68,7 +68,7 @@ def runGPT(input_message):
             "new_code_output": test_script_output,
             "assistant_response": json_object,
         }
-        user_proxy_response = proxy_agent_naeblis.get_completion(client, str(completion_object))
+        user_proxy_response = proxy_agent_naeblis.get_completion(str(completion_object))
         user_proxy_response = agent_tools.getjson(json_object_string=user_proxy_response)
         print("User_proxy: ", user_proxy_response)
 
