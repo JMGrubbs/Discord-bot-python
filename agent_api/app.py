@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from index import main_operations
 from flask_cors import CORS
 from env import api_config
+import asyncio
+
 
 # from cache.RedisCache import get_message, get_all_messages
 # import json
@@ -14,10 +16,10 @@ CORS(app)
 def send_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-    # data example: { "assistant_id": "some-assistant-id", "message": "Hello, how are you?" }
     try:
         data = request.json
-        response = main_operations.addMessage(data)
+        response = asyncio.run(main_operations.addMessage(data))
+        print("response", response)
         return jsonify(response), 200
     except KeyError:
         return jsonify({"error": "Invalid message"}), 400

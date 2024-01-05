@@ -18,7 +18,6 @@ function ChatApp() {
         }
     };
 
-
     const handleAgentResponse = async (response) => {
         response = await sendMessage(response);
         if ("error" in response) {
@@ -26,12 +25,10 @@ function ChatApp() {
             setResponseStatus('error');
             return;
         }
-        console.log("Response from agent:", response);
         setResponseStatus('processing');
         setMessages(response["messages"]);
         loopWithDelay();
     };
-
 
     async function loopWithDelay() {
         let localResponseStatus = 'processing'; // Local variable for loop control because state is not updated immediately
@@ -45,6 +42,7 @@ function ChatApp() {
                     setResponseStatus('complete'); // Update state
                     setMessages(response["messages"]); // Update state
                 } else {
+                    console.log("Waiting for response...");
                     await sleep(3000); // Sleep for 3 seconds
                 }
             } catch (error) {

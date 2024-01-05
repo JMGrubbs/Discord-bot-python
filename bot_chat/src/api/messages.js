@@ -11,11 +11,10 @@ export const sendMessage = async (mostRecentMessage) => {
         };
 
         const response = await axios.post(apiUrl + "prompt", mostRecentMessage, { headers: headers });
-
         return response.data["response"];
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { "status": "error", "message": "Error Getting response from agent" };
+        return { "messages": [{ "message": "Error sending message", "sender": "agent", "status": "error" }] };
     }
 };
 

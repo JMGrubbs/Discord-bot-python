@@ -1,6 +1,7 @@
 import time
 
 # from pydantic import BaseModel
+# import asyncio
 from openai import OpenAI
 from env import api_config
 
@@ -91,8 +92,10 @@ class Agents:
         )
 
     # ----------------------- Action Functions -----------------------
-    async def get_completion(self, input_message, newThread=False):
+    async def get_completion(self, input_message, newThread=False) -> str:
         self.currentPrompt = input_message.lower()
+        result = self.currentPrompt
+
         if self.currentThread is None or newThread is True:
             self.currentThread = self.createNewThread()
 
@@ -106,13 +109,17 @@ class Agents:
             self.runstatus = self.retrieveRun().status
             print(f"{self.agentName} run status: ", self.runstatus)
             if tries > 10:
-                print("Error: GPT run took too long.")
                 cancelRun = self.cancelRun()
-                print("Canceled run: ", cancelRun)
-                quit()
+                return {"error": "GPT run took too long.", "run": cancelRun}
             tries += 1
             time.sleep(1)
 
         self.currentPromptResponse = self.getResponseFromOpenai()
 
-        return self.currentPromptResponse
+        result = self.currentPromptResponse
+
+        if not isinstance(result, str):
+            print("Error: Expected function to return an str")
+            raise TypeError("Expected function to return an str")
+
+        return result
