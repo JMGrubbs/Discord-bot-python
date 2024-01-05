@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from index import addMessage, getMessages
+from index import main_operations
 from flask_cors import CORS
 from env import api_config
 
@@ -15,30 +15,37 @@ def send_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
     # data example: { "assistant_id": "some-assistant-id", "message": "Hello, how are you?" }
-    data = request.json
-    package_type = data.get("package_type")
-    if not package_type:
-        return jsonify({"error": "package_type is required"}), 400
-
-    if package_type == "agentprompt":
-        response = addMessage(data["prompt"])
+    try:
+        data = request.json
+        response = main_operations.addMessage(data)
         return jsonify(response), 200
-    return jsonify({"error": "Invalid package_type"}), 400
+    except KeyError:
+        return jsonify({"error": "Invalid message"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/messages", methods=["GET"])
 def get_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-    response = getMessages()
-    return jsonify(response), 200
+    try:
+        response = main_operations.getResponse()
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/deletemessages", methods=["DELETE"])
 def delete_messages():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
-    return jsonify(getMessages()), 200
+
+    try:
+        response = main_operations.clearMessages()
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 if __name__ == "__main__":

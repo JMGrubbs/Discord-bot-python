@@ -1,9 +1,7 @@
-from pydantic import BaseModel
-from datetime import datetime
 import classes.Agent as Agent
 
 
-class Opperations(BaseModel):
+class Operations:
     response: dict = {}
     proxy_agent: Agent = None
     proxy_agent_messages: list[dict] = []
@@ -13,11 +11,9 @@ class Opperations(BaseModel):
     newUserMessage: dict = None
     newAgentMessage: dict = None
 
-    def __pydantic_fields_set__(self, proxy_agent, assistant_agent):
+    def __init__(self, proxy_agent, assistant_agent):
         self.proxy_agent = proxy_agent
         self.assistant_agent = assistant_agent
-        self.newUserMessage = None
-        self.newAgentMessage = None
 
         self.response = {
             "messages": [],
@@ -30,23 +26,43 @@ class Opperations(BaseModel):
     def createMessage(self, input_message, author) -> dict:
         message = {
             "sender": author,
-            "id": len(self.messages) + 1,
+            "id": len(self.response["messages"]) + 1,
         }
         if author == "user":
             message["status"] = "complete"
-            message["timestamp"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
             message["message"] = input_message
         elif author == "agent":
             message["status"] = "processing"
-            message["timestamp"] = None
-            message["message"] = None
+            message["message"] = "Hello World"
 
-        self.messages.append(message)
+        self.response["messages"].append(message)
 
-    def addMessage(self, input_message, author) -> dict:
-        new_message = input_message.lower()
-
+    def addMessage(self, data) -> dict:
+        new_message = data["message"].lower()
         # Create a new message object for the incoming message from the user, and add it to the messages list
-        self.createMessage(new_message, author)
+        self.createMessage(new_message, data.get("sender"))
+        self.createMessage(new_message, "agent")
 
-        return {"response": {"messages": self.messages, "file": self.file_object}}
+        return {"response": self.response}
+
+    def getResponse(self) -> dict:
+        if self.response["messages"][-1]["status"] == "processing":
+            self.response["messages"][-1]["status"] = "complete"
+            return {"response": self.response}
+        return {"response": self.response}
+
+    def clearMessages(self):
+        self.response["messages"] = []
+        return {"response": self.response}
+
+
+# async def my_async_function():
+#     print("Start of async function")
+#     await asyncio.sleep(1)  # Simulating an async IO operation
+#     print("End of async function")
+
+# # Running the async function
+# async def main():
+#     await my_async_function()
+
+# asyncio.run(Opperations.addMessage())

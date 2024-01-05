@@ -1,5 +1,6 @@
 import time
-from pydantic import BaseModel
+
+# from pydantic import BaseModel
 from openai import OpenAI
 from env import api_config
 
@@ -9,7 +10,7 @@ CLIENT = OpenAI(
 )
 
 
-class Agents(BaseModel):
+class Agents:
     agentName: str
     agentID: str
     model: str
@@ -21,7 +22,7 @@ class Agents(BaseModel):
     currentRunId: str = None
     runstatus: str = None
 
-    def __pydantic_fields_set__(self, agentID, model, instructions, agentName):
+    def __init__(self, agentID, model, instructions, agentName):
         self.agentID = agentID
         self.model = model
         self.instructions = instructions
@@ -90,7 +91,7 @@ class Agents(BaseModel):
         )
 
     # ----------------------- Action Functions -----------------------
-    def get_completion(self, input_message, newThread=False):
+    async def get_completion(self, input_message, newThread=False):
         self.currentPrompt = input_message.lower()
         if self.currentThread is None or newThread is True:
             self.currentThread = self.createNewThread()

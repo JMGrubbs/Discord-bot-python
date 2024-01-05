@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Message from './Message';
-import { getMessages, sendMessage } from '../api/messages.js';
+import { getMessages, sendMessage, deleteMessages } from '../api/messages.js';
 
 
 function ChatApp() {
@@ -11,17 +11,27 @@ function ChatApp() {
 
     const handleSendMessage = () => {
         if (newMessage) {
-            let today = new Date();
-            let formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
-            setMessages(messages => [...messages, { id: null, timestamp: formattedDate, message: newMessage, sender: sender, status: 'sent' }]);
-            handleAgentResponse(newMessage);
+            let message = { id: null, message: newMessage, sender: sender, status: 'sent' };
+            setMessages(messages => [...messages, message]);
+            handleAgentResponse(message);
             setNewMessage('');
         }
     };
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+
+    const handleAgentResponse = async (response) => {
+        response = await sendMessage(response);
+        if ("error" in response) {
+            console.error("Error in sending message:", response["error"]);
+            setResponseStatus('error');
+            return;
+        }
+        console.log("Response from agent:", response);
+        setResponseStatus('processing');
+        setMessages(response["messages"]);
+        loopWithDelay();
+    };
+
 
     async function loopWithDelay() {
         let localResponseStatus = 'processing'; // Local variable for loop control because state is not updated immediately
@@ -29,12 +39,11 @@ function ChatApp() {
         while (localResponseStatus === 'processing') {
             try {
                 const response = await getMessages();
-                const lastStatus = response["data"][response["data"].length - 1]["status"];
-
+                const lastStatus = response["messages"][response["messages"].length - 1]["status"]; // Get the status of the last message in the response
                 if (lastStatus === "complete") {
                     localResponseStatus = 'complete'; // Update local variable
                     setResponseStatus('complete'); // Update state
-                    setMessages(response["data"]); // Update state
+                    setMessages(response["messages"]); // Update state
                 } else {
                     await sleep(3000); // Sleep for 3 seconds
                 }
@@ -45,21 +54,15 @@ function ChatApp() {
         }
     }
 
-    const handleAgentResponse = async (response) => {
-        let json_package = {
-            "package_type": "agentprompt",
-            "prompt": response,
-            "assistant_id": "Some other data"
-        }
-        response = await sendMessage(json_package);
-        if (response["status"] === "error") {
-            setResponseStatus('error');
-            return;
-        }
-        setResponseStatus('processing');
-        setMessages(response["data"]["messages"]);
-        loopWithDelay();
-    };
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function handleClearMessages() {
+        setMessages([]);
+        await deleteMessages();
+        return;
+    }
 
     return (
         <div className="chat-app">
@@ -82,7 +85,10 @@ function ChatApp() {
                         setNewMessage(e.target.value)
                     }}
                 />
-                <button onClick={handleSendMessage}>Send</button>
+                <button className='message-input button send' onClick={handleSendMessage}>Send</button>
+                <button className='message-input button clear' onClick={handleClearMessages}>Clear</button>
+            </div>
+            <div className='clear-messages'>
             </div>
         </div>
     );

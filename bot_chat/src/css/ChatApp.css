@@ -60,12 +60,20 @@
     padding: 8px;
     margin-right: 8px;
   }
-
-  button {
-    background-color: #007bff;
+  .message-input.button {
+    flex: 0 0 auto;
     color: #fff;
     border: none;
     border-radius: 4px;
     padding: 8px 16px;
+    margin: 5px;
     cursor: pointer;
+  }
+
+  .message-input.button.send {
+    background-color: #007bff;
+  }
+
+  .message-input.button.clear {
+    background-color: #ff0000;
   }
