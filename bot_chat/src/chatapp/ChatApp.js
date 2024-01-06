@@ -9,6 +9,11 @@ function ChatApp() {
     const [sender, setSender] = useState('');
     const [responseStatus, setResponseStatus] = useState('complete');
 
+    useState(async () => {
+        const response = await getMessages();
+        setMessages(response["messages"]);
+    }, []);
+
     const handleSendMessage = () => {
         if (newMessage) {
             let message = { id: null, message: newMessage, sender: sender, status: 'sent' };
@@ -65,7 +70,7 @@ function ChatApp() {
     return (
         <div className="chat-app">
             <div className="message-list">
-                {messages.map((messageObject, index) => (
+                {[...messages].reverse().map((messageObject, index) => (
                     <Message key={index} text={messageObject.message} sender={messageObject.sender} />
                 ))}
             </div>

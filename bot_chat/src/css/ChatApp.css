@@ -11,6 +11,8 @@
 
   .message-list {
     padding: 30px;
+    display: flex;
+    flex-direction: column-reverse;
     overflow-y: scroll;
     height: 87vh;
   }
@@ -28,7 +30,7 @@
     border-radius: 4px;
     padding: 8px;
     margin-bottom: 8px;
-    max-width: 60%;
+    max-width: 80%;
     word-wrap: break-word;
     display: block; /* or 'block' if you want each message to be on its own line */
     color: black;
@@ -36,6 +38,7 @@
 
   .message.user {
     text-align: right; /* Align all messages to the right */
+    display: block; /* or 'block' if you want each message to be on its own line */
     margin-left: auto; /* Pushes the element to the right */
   }
 
@@ -57,7 +60,7 @@
   .message.user.holder {
     color:#fff;
     font-style: none;
-    background-color: #1300e3;
+    background-color: #777777;
     display: inline-block;
   }
 
@@ -82,7 +85,7 @@
   }
 
   .message-input.button.send {
-    background-color: #00ff62;
+    background-color: #30a15b;
   }
 
   .message-input.button.clear {
