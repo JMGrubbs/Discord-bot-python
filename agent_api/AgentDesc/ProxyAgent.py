@@ -29,7 +29,7 @@ proxy_agent = {
         "metadata": {
             "role": "user",
             "instructions": """
-                Your job is to answer questions in an informative and corgual way.
+                Your job is to answer questions in an informative and cordial way.
                 """,
         },
     },

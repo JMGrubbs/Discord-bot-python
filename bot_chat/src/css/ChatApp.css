@@ -1,17 +1,27 @@
 .chat-app {
     width: 800px;
     margin: 0 auto;
-    margin-top: 30px;
+    /* margin-top: 30px; */
     position: flex;
-    border: 1px solid #ccc;
-    background-color: #fff;
+    height: 100vh;
+    border: 1px solid #3a3636;
+    background-color: #3a3636;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   }
 
   .message-list {
     padding: 30px;
     overflow-y: scroll;
-    height: 500px;
+    height: 87vh;
+  }
+
+  .message-input {
+    display: flex;
+    padding: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #313030;
+    background-color: #3a3636;
+    font-size: large;
   }
 
   .message {
@@ -21,6 +31,7 @@
     max-width: 60%;
     word-wrap: break-word;
     display: block; /* or 'block' if you want each message to be on its own line */
+    color: black;
   }
 
   .message.user {
@@ -31,6 +42,11 @@
   .message.agent {
     display: block; /* or 'block' if you want each message to be on its own line */
     text-align: left; /* Align all messages to the left */
+  }
+
+  .message.sender.name {
+    display: block;
+    color: #fff;
   }
 
   .message.agent.holder {
@@ -45,21 +61,16 @@
     display: inline-block;
   }
 
-  .message-input {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ccc;
-    background-color: #fff;
-    font-size: large;
-  }
-
   input[type='text'] {
     flex: 1;
-    border: 1px solid #ccc;
+    border: 1px solid #151414;
     border-radius: 4px;
     padding: 8px;
     margin-right: 8px;
+    background-color: #3a3636;
+    color: #fff;
   }
+
   .message-input.button {
     flex: 0 0 auto;
     color: #fff;
@@ -71,9 +82,9 @@
   }
 
   .message-input.button.send {
-    background-color: #007bff;
+    background-color: #00ff62;
   }
 
   .message-input.button.clear {
-    background-color: #ff0000;
+    background-color: #4d4d4d;
   }

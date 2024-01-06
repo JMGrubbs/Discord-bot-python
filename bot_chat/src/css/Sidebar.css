@@ -1,10 +1,12 @@
 /* src/Sidebar.css */
 .sidebar {
+    background-color: #1d1b1b;
     width: 250px;
-    color: #000000;
+    color: #ffffff;
     padding: 20px;
-    height: 100%;
-    position: flex;
+    height: 100vh;
+    overflow: auto;
+    position: left;
     top: 60px;
     left: 0;
   }
@@ -22,6 +24,8 @@ ul {
 /* Style for list items */
 ul li {
   padding: 10px 0; /* Add some vertical spacing between list items */
+  margin: 5px;
+  color: white; /* Or any color you had for the text */
   border-bottom: 1px solid #ddd; /* Add a horizontal line as a separator */
 }
 
@@ -32,6 +36,6 @@ ul li:last-child {
 
 /* Hover effect for list items */
 ul li:hover {
-  background-color: #f0f0f0; /* Change background color on hover */
+  background-color: #6d6d6d; /* Change background color on hover */
   transition: background-color 0.3s; /* Smooth transition effect */
 }

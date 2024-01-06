@@ -15,13 +15,22 @@ function Sidebar() {
             });
     }, []);
 
+    const handleLinkClick = (event) => {
+        console.log(event.target.innerText);
+        // return (
+        //     <div>
+        //         <a href={`/creations/${file}`} download>{file}</a>
+        //     </div>)
+    }
+
     return (
         <div className="sidebar">
             <h2>Download a file</h2>
             <ul>
                 {files.map((file, index) => (
-                    <li key={index}>
-                        <a href={`/creations/${file}`} download>{file}</a>
+                    <li onClick={handleLinkClick} key={index}>
+                        {file}
+                        {/* <a href={`/creations/${file}`} download>{file}</a> */}
                     </li>
                 ))}
             </ul>
