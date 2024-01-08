@@ -6,10 +6,10 @@ function Message({ sender, text }) {
 
     // Apply both `message` and the sender-specific class
     return (
-        <div className={`message ${senderClass}`}>
-            <div className={`message sender name ${senderClass}`}>{sender}</div>
-            <div className={`message ${senderClass} holder`}>
-                <div className="message-text">{text}</div>
+        <div className={`message-list-message ${senderClass}`}>
+            <div className={`message-list-message sender ${senderClass}`}>{sender}</div>
+            <div className={`message-list-message text ${senderClass} holder`}>
+                {text}
             </div>
         </div>
     );

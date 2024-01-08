@@ -69,7 +69,7 @@ function ChatApp() {
 
     return (
         <div className="chat-app">
-            <div className="message-list">
+            <div className={`message list`}>
                 {[...messages].reverse().map((messageObject, index) => (
                     <Message key={index} text={messageObject.message} sender={messageObject.sender} />
                 ))}
@@ -78,7 +78,7 @@ function ChatApp() {
                 {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
                 {responseStatus === 'error' ? <Message text="error getting data..." sender="agent" /> : null}
             </div>
-            <div className="message-input">
+            <div className={`message-list-input`}>
                 <input
                     type="text"
                     placeholder="Type your message..."
@@ -88,10 +88,8 @@ function ChatApp() {
                         setNewMessage(e.target.value)
                     }}
                 />
-                <button className='message-input button send' onClick={handleSendMessage}>Send</button>
-                <button className='message-input button clear' onClick={handleClearMessages}>Clear</button>
-            </div>
-            <div className='clear-messages'>
+                <button className='message-list-input button send' onClick={handleSendMessage}>Send</button>
+                <button className='message-list-input button clear' onClick={handleClearMessages}>Clear</button>
             </div>
         </div>
     );

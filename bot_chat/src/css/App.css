@@ -13,11 +13,3 @@ body {
   flex-direction: row;
 }
 
-h1 {
-  text-align: center;
-  margin: 0;
-  padding: 10px;
-  background-color: #3a3636;
-  color: #fff;
-}
-
