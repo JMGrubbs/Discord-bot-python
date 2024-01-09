@@ -23,6 +23,10 @@ class Operations:
                 "fileName": "TestFile",
                 "Content": "print('Hello World')",
             },
+            "network_box": {
+                "proxy_network_messages": [],
+                "assistant_network_messages": [],
+            },
         }
 
     def createMessage(self, input_message, author) -> dict:
@@ -47,19 +51,15 @@ class Operations:
         # Create a new message object for the agents response to the user
         self.createMessage(new_message, "agent")
 
-        testing_agent = await self.proxy_agent.get_completion(new_message)
+        completion = await self.proxy_agent.get_completion(new_message)
 
-        self.response["messages"][-1]["message"] = testing_agent
+        self.response["messages"][-1]["message"] = completion
         self.response["messages"][-1]["status"] = "complete"
 
-        return {"response": self.response}
-
     def getResponse(self) -> dict:
+        self.response["proxy_network_messages"] = self.proxy_agent.getNetworkMessages()
         return {"response": self.response}
 
     def clearMessages(self):
         self.response["messages"] = []
         return {"response": self.response}
-
-    def promptAgent(self, input_message):
-        return

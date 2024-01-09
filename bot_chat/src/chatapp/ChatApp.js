@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Message from './Message';
+import NetworkBox from './networkbox/NetworkBox';
 import { getMessages, sendMessage, deleteMessages } from '../api/messages.js';
 
 
@@ -8,9 +9,11 @@ function ChatApp() {
     const [newMessage, setNewMessage] = useState('');
     const [sender, setSender] = useState('');
     const [responseStatus, setResponseStatus] = useState('complete');
+    const [networkEvents, setNetworkEvents] = useState([]);
 
     useState(async () => {
         const response = await getMessages();
+        console.log(response)
         setMessages(response["messages"]);
     }, []);
 
@@ -69,27 +72,31 @@ function ChatApp() {
 
     return (
         <div className="chat-app">
-            <div className={`message list`}>
-                {[...messages].reverse().map((messageObject, index) => (
-                    <Message key={index} text={messageObject.message} sender={messageObject.sender} />
-                ))}
+            <div className={`chat box`}>
+                <div className={`message-list`}>
+                    {[...messages].reverse().map((messageObject, index) => (
+                        <Message key={index} text={messageObject.message} sender={messageObject.sender} />
+                    ))}
+                    {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
+                    {responseStatus === 'error' ? <Message text="error getting data..." sender="agent" /> : null}
+                </div>
+                <div className={`message-list-input`}>
+                    <input
+                        type="text"
+                        placeholder="Type your message..."
+                        value={newMessage}
+                        onChange={(e) => {
+                            setSender('user')
+                            setNewMessage(e.target.value)
+                        }}
+                    />
+                    <button className='message-list-input button send' onClick={handleSendMessage}>Send</button>
+                    <button className='message-list-input button clear' onClick={handleClearMessages}>Clear</button>
+                </div>
             </div>
-            <div>
-                {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
-                {responseStatus === 'error' ? <Message text="error getting data..." sender="agent" /> : null}
-            </div>
-            <div className={`message-list-input`}>
-                <input
-                    type="text"
-                    placeholder="Type your message..."
-                    value={newMessage}
-                    onChange={(e) => {
-                        setSender('user')
-                        setNewMessage(e.target.value)
-                    }}
-                />
-                <button className='message-list-input button send' onClick={handleSendMessage}>Send</button>
-                <button className='message-list-input button clear' onClick={handleClearMessages}>Clear</button>
+            <div className={`network box`}>
+                <NetworkBox />
+                <NetworkBox />
             </div>
         </div>
     );

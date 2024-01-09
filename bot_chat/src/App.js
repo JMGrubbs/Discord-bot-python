@@ -5,7 +5,6 @@ import './css/ChatApp.css';
 import './css/NetworkBox.css';
 import ChatApp from './chatapp/ChatApp';
 import Sidebar from './sidebar/Sidebar';
-import NetworkApp from './networkapp/NetworkApp';
 
 function App() {
   return (
@@ -13,7 +12,6 @@ function App() {
       <main className='app-holder'>
         <Sidebar />
         <ChatApp />
-        <NetworkApp />
       </main>
     </div>
   );

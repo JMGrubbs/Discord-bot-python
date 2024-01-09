@@ -9,12 +9,11 @@ export const sendMessage = async (mostRecentMessage) => {
             'Content-Type': 'application/json',
             "api-key": apiKey,
         };
-
         const response = await axios.post(apiUrl + "prompt", mostRecentMessage, { headers: headers });
         return response.data["response"];
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { "messages": [{ "message": "Error sending message", "sender": "agent", "status": "error" }] };
+        return { "messages": [], "file": {} };
     }
 };
 
@@ -24,13 +23,12 @@ export const getMessages = async () => {
             'Content-Type': 'application/json',
             "api-key": apiKey,
         };
-
         const response = await axios.get(apiUrl + "messages", { headers: headers });
 
         return response.data["response"];
     } catch (error) {
         console.error('Error fetching data:', error);
-        return { "status": "error", "message": "Error Getting responses from api" };
+        return { "messages": [], "file": {} };
     }
 }
 

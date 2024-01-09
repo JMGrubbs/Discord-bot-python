@@ -22,12 +22,14 @@ class Agents:
     currentPromptResponse: str = None
     currentRunId: str = None
     runstatus: str = None
+    network_messages: list[dict] = []
 
     def __init__(self, agentID, model, instructions, agentName):
         self.agentID = agentID
         self.model = model
         self.instructions = instructions
         self.agentName = agentName
+        self.network_messages = []
 
     def getAgentID(self):
         return self.agentID
@@ -70,6 +72,17 @@ class Agents:
             run_id=self.currentRunId,
         )
 
+    def getNetworkMessages(self):
+        return self.network_messages
+
+    def setNetworkMessages(self, message):
+        network_message = {
+            "agent": self.agentName,
+            "task": "get_completion",
+            "message": message,
+        }
+        self.network_messages.append(network_message)
+
     # ----------------------- Run Functions -----------------------
     def createNewRun(self):
         return CLIENT.beta.threads.runs.create(
@@ -93,6 +106,13 @@ class Agents:
 
     # ----------------------- Action Functions -----------------------
     async def get_completion(self, input_message, newThread=False) -> str:
+        self.setNetworkMessages(input_message)
+
+        self.runstatus = "completed"
+        self.currentPromptResponse = input_message
+
+        return input_message
+
         self.currentPrompt = input_message.lower()
         result = self.currentPrompt
 

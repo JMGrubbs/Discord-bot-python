@@ -17,9 +17,8 @@ def send_prompt():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
     try:
-        data = request.json
-        response = asyncio.run(main_operations.addMessage(data))
-        print("response", response)
+        asyncio.run(main_operations.addMessage(request.json))
+        response = main_operations.getResponse()
         return jsonify(response), 200
     except KeyError:
         return jsonify({"error": "Invalid message"}), 400
@@ -33,6 +32,7 @@ def get_prompt():
         return jsonify({"error": "Invalid API key"}), 401
     try:
         response = main_operations.getResponse()
+        print(response)
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

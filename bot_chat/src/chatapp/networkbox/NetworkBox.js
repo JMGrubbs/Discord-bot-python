@@ -4,8 +4,8 @@ function NetworkApp() {
     const [events, setEvents] = useState(["Network App", "Network"]);
 
     return (
-        <div className={`network app`}>
-            <div className={`network event list`}>
+        <div className={`network event list`}>
+            <div className={`network event list proxy`}>
                 {events.map((event, index) => (
                     <div key={index} className='event'>
                         <div className='event-text'>
