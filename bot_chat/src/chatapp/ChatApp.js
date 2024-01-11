@@ -9,12 +9,13 @@ function ChatApp() {
     const [newMessage, setNewMessage] = useState('');
     const [sender, setSender] = useState('');
     const [responseStatus, setResponseStatus] = useState('complete');
-    const [networkEvents, setNetworkEvents] = useState([]);
+    const [networkEvents, setNetworkEvents] = useState({ "proxy_network_messages": [], "assistant_network_messages": [] });
 
     useState(async () => {
         const response = await getMessages();
-        console.log(response)
+        console.log("response", response)
         setMessages(response["messages"]);
+        setNetworkEvents(response["network_box"])
     }, []);
 
     const handleSendMessage = () => {
@@ -28,6 +29,7 @@ function ChatApp() {
 
     const handleAgentResponse = async (response) => {
         response = await sendMessage(response);
+        console.log("response", response)
         if ("error" in response) {
             console.error("Error in sending message:", response["error"]);
             setResponseStatus('error');
@@ -95,8 +97,8 @@ function ChatApp() {
                 </div>
             </div>
             <div className={`network box`}>
-                <NetworkBox />
-                <NetworkBox />
+                <NetworkBox events={networkEvents["proxy_network_messages"]} />
+                <NetworkBox events={networkEvents["assistant_network_messages"]} />
             </div>
         </div>
     );

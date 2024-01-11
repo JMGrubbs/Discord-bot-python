@@ -9,11 +9,12 @@ export const sendMessage = async (mostRecentMessage) => {
             'Content-Type': 'application/json',
             "api-key": apiKey,
         };
-        const response = await axios.post(apiUrl + "prompt", mostRecentMessage, { headers: headers });
-        return response.data["response"];
+        const resposne = await axios.post(apiUrl + "prompt", mostRecentMessage, { headers: headers })
+            .then(response => { return response.data["response"] });
+        return resposne;
     } catch (error) {
-        console.error('Error fetching data:', error);
-        return { "messages": [], "file": {} };
+        console.error('Error fetching data using sendMessage:', error);
+        return { "messages": [], "file": {}, "network_box": {} };
     }
 };
 
@@ -23,12 +24,14 @@ export const getMessages = async () => {
             'Content-Type': 'application/json',
             "api-key": apiKey,
         };
-        const response = await axios.get(apiUrl + "messages", { headers: headers });
-
-        return response.data["response"];
+        const resposne = await axios.get(apiUrl + "getmessages", { headers: headers })
+            .then(response => {
+                return response.data["response"]
+            });
+        return resposne;
     } catch (error) {
-        console.error('Error fetching data:', error);
-        return { "messages": [], "file": {} };
+        console.error('Error fetching data using getMessages:', error);
+        return { "messages": [], "file": {}, "network_box": {} };
     }
 }
 
@@ -43,7 +46,7 @@ export const deleteMessages = async () => {
 
         return response.data["response"];
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data using deleteMessage:', error);
         return { "status": "error", "message": "Error deleteing responses from api" };
     }
 }

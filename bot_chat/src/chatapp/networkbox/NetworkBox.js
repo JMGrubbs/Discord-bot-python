@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import NetworkMessage from './NetworkBox.js';
 
-function NetworkApp() {
-    const [events, setEvents] = useState(["Network App", "Network"]);
+function NetworkApp({ events }) {
 
     return (
         <div className={`network event list`}>
             <div className={`network event list proxy`}>
                 {events.map((event, index) => (
-                    <div key={index} className='event'>
-                        <div className='event-text'>
-                            {event}
-                        </div>
-                    </div>
+                    <NetworkMessage key={index} text={event} />
                 ))}
             </div>
         </div >
