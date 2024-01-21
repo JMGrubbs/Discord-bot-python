@@ -13,7 +13,6 @@ function ChatApp() {
 
     useState(async () => {
         const response = await getMessages();
-        console.log("response", response)
         setMessages(response["messages"]);
         setNetworkEvents(response["network_box"])
     }, []);
@@ -37,6 +36,7 @@ function ChatApp() {
         }
         setResponseStatus('processing');
         setMessages(response["messages"]);
+        setNetworkEvents(response["network_box"])
         loopWithDelay();
     };
 
@@ -51,6 +51,8 @@ function ChatApp() {
                     localResponseStatus = 'complete'; // Update local variable
                     setResponseStatus('complete'); // Update state
                     setMessages(response["messages"]); // Update state
+                    setNetworkEvents(response["network_box"])
+
                 } else {
                     console.log("Waiting for response...");
                     await sleep(3000); // Sleep for 3 seconds
@@ -97,8 +99,8 @@ function ChatApp() {
                 </div>
             </div>
             <div className={`network box`}>
-                <NetworkBox events={networkEvents["proxy_network_messages"]} />
-                <NetworkBox events={networkEvents["assistant_network_messages"]} />
+                <NetworkBox networkobject={networkEvents["proxy_network_messages"]} />
+                <NetworkBox networkobject={networkEvents["assistant_network_messages"]} />
             </div>
         </div>
     );

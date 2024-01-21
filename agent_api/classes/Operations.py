@@ -57,7 +57,9 @@ class Operations:
         self.response["messages"][-1]["status"] = "complete"
 
     def getResponse(self) -> dict:
-        self.response["proxy_network_messages"] = self.proxy_agent.getNetworkMessages()
+        self.response["network_box"][
+            "proxy_network_messages"
+        ] = self.proxy_agent.getNetworkMessages()
         return {"response": self.response}
 
     def clearMessages(self):

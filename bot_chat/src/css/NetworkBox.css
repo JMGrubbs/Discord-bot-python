@@ -31,3 +31,11 @@
   overflow-y: scroll;
   height: 90vh;
 }
+
+.network.message {
+  margin: 5px;
+  border-radius: 2px;
+  background-color: #5b5454;
+  box-shadow: 0 0 10px #5b5454;
+  overflow-y: scroll;
+}

@@ -26,8 +26,8 @@ def send_prompt():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route("/messages", methods=["GET"])
-def get_prompt():
+@app.route("/getmessages", methods=["GET"])
+def getmessages():
     if request.headers.get("api-key") != API_KEY:
         return jsonify({"error": "Invalid API key"}), 401
     try:
