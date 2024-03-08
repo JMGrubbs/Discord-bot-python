@@ -2,3 +2,4 @@
 .venvapi
 *.toml
 *.json
+__pycache__

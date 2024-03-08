@@ -51,12 +51,7 @@ class Agents:
         )
 
     def getResponseFromOpenai(self):
-        return (
-            CLIENT.beta.threads.messages.list(thread_id=self.currentThread)
-            .data[0]
-            .content[0]
-            .text.value
-        )
+        return CLIENT.beta.threads.messages.list(thread_id=self.currentThread).data[0].content[0].text.value
 
     def getCurrentPromptResponse(self):
         if self.currentPromptResponse is None:
@@ -111,7 +106,7 @@ class Agents:
         self.runstatus = "completed"
         self.currentPromptResponse = input_message
 
-        return input_message
+        # return input_message
 
         self.currentPrompt = input_message.lower()
         result = self.currentPrompt

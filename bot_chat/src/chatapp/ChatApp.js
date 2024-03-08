@@ -35,8 +35,8 @@ function ChatApp() {
             return;
         }
         setResponseStatus('processing');
-        setMessages(response["messages"]);
-        setNetworkEvents(response["network_box"])
+        // setMessages(response["messages"]);
+        // setNetworkEvents(response["network_box"])
         loopWithDelay();
     };
 
@@ -81,8 +81,6 @@ function ChatApp() {
                     {[...messages].reverse().map((messageObject, index) => (
                         <Message key={index} text={messageObject.message} sender={messageObject.sender} />
                     ))}
-                    {responseStatus === 'processing' ? <Message text="processing..." sender="agent" /> : null}
-                    {responseStatus === 'error' ? <Message text="error getting data..." sender="agent" /> : null}
                 </div>
                 <div className={`message-list-input`}>
                     <input

@@ -28,10 +28,11 @@ export const getMessages = async () => {
             .then(response => {
                 return response.data["response"]
             });
+        console.log("response from getMessages", resposne);
         return resposne;
     } catch (error) {
         console.error('Error fetching data using getMessages:', error);
-        return { "messages": [], "file": {}, "network_box": {} };
+        return { "messages": [], "file": {}, "network_box": { "proxy_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }], "assistant_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }] } };
     }
 }
 
