@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+
 from routes.home_routes import homeRoutes
 from routes.message_routes import messageRoutes
+
+from agent_desc.ProxyAgent import proxy_agent
+from classes.agent_class import Agent
 
 app = FastAPI()
 
@@ -13,6 +17,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+proxyAgent = Agent(**proxy_agent)
 
 app.include_router(homeRoutes, prefix="/home", tags=["home"])
 app.include_router(messageRoutes, prefix="/message", tags=["message"])

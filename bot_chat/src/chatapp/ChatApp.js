@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Message from './Message';
 import NetworkBox from './networkbox/NetworkBox';
-import { getMessages, sendMessage, deleteMessages } from '../api/messages.js';
+// import { getMessages, sendMessage, deleteMessages } from '../api/flask/messages.js';
+import { getMessages, sendMessage, deleteMessages } from '../api/fastapi/messages.js';
 
 
 function ChatApp() {
