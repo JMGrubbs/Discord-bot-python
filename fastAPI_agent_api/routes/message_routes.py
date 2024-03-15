@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from env import API_KEY
 
-homeRoutes = APIRouter()
+messageRoutes = APIRouter()
 
 
 class ResponseModel(BaseModel):
@@ -17,8 +17,15 @@ async def get_api_key(api_key: str):
         raise HTTPException(status_code=400, detail="Invalid API Key")
 
 
-@homeRoutes.get("/", tags=["home"], response_model=ResponseModel)
+@messageRoutes.get("/getmessages", tags=["messages"], response_model=ResponseModel)
 async def get_messages(request: Request):
+    await get_api_key(request.headers["api-key"])
+
+    return {"response": {"temp": "Message sent successfully"}}
+
+
+@messageRoutes.get("/sendmessage", tags=["messages"], response_model=ResponseModel)
+async def send_message(request: Request):
     await get_api_key(request.headers["api-key"])
 
     return {"response": {"temp": "Message sent successfully"}}
