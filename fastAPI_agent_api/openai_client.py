@@ -11,4 +11,4 @@ async def openai_client_connection():
     try:
         yield CLIENT
     finally:
-        await CLIENT.close()
+        CLIENT.close()

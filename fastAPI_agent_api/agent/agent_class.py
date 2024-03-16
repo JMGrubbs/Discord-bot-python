@@ -1,7 +1,6 @@
 from pydantic import BaseModel
-from classes.thread_class import Thread
 
-from openai_client import openai_client_connection
+# from typing import Optional, List
 
 
 class Metadata(BaseModel):
@@ -26,16 +25,8 @@ class Agent(BaseModel):
             },
         }
 
-    def get_client(self):
-        return openai_client_connection()
-
     def get_instructions(self):
         return self.metadata.instructions
 
     def set_working_status(self, status: bool):
         self.working = status
-
-    def create_thread(self):
-        newThread = Thread(agent=self.get_agent())
-        print(newThread.dict())
-        # return self.get_client().beta.thread.create()
