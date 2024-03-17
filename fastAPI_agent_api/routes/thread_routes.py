@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException, Request
 
 from env import API_KEY
-from thread.tools import create_thread, get_threads
+from thread.tools import (
+    create_thread,
+    get_threads,
+)
 
 threadRoutes = APIRouter()
 
@@ -27,5 +30,4 @@ async def get_messages(request: Request):
 async def send_message(request: Request):
     await get_api_key(request.headers["api-key"])
     new_thread = await create_thread()
-
     return new_thread.model_dump()

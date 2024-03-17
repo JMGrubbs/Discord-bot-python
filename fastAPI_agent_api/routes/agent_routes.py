@@ -47,7 +47,7 @@ async def get_agent_object_from_cache(request: Request):
 
 @agentRoutes.post("/proxy/agent/{agent_id}")
 async def set_proxy_agent(request: Request):
-    await get_api_key(request.headers["api-key"])
+    # await get_api_key(request.headers["api-key"])
 
     global proxy_agent
     proxy_agent = await create_agent_obj(request.path_params["agent_id"])
