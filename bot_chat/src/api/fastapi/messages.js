@@ -60,7 +60,6 @@ export const deleteMessages = async () => {
         };
 
         const response = await axios.delete(fastApiUrl + "deletemessages", { headers: headers });
-        console.log("response from deleteMessages", response);
         return response.data["response"];
     } catch (error) {
         console.error('Error fetching data using deleteMessage:', error);
