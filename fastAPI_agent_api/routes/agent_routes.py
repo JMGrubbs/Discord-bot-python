@@ -6,16 +6,14 @@ from agent.tools import (
     get_agent_from_cache,
     create_agent_obj,
 )
-
-
 from env import API_KEY
+
+proxy_agent = None
 
 agentRoutes = APIRouter()
 
 # class ResponseModel(BaseModel):
 #     data: Union[dict, list]
-
-proxy_agent = None
 
 
 async def get_api_key(api_key: str):
@@ -77,21 +75,17 @@ async def set_proxy_thread(request: Request):
         return {"Status": "No agent set!"}
 
     proxy_agent.current_thread_id = request.path_params["thread_id"]
+    await proxy_agent.fetch_messages()
 
     return proxy_agent
 
 
-@agentRoutes.post("/proxy/message")
+@agentRoutes.get("/proxy/messages")
 async def add_proxy_message(request: Request):
     await get_api_key(request.headers["api-key"])
-
-    req_json = await request.json()
 
     global proxy_agent
     if proxy_agent is None:
         return {"Status": "No agent set!"}
 
-    message = req_json.get("user-input")
-    await proxy_agent.get_completion(message)
-
-    return proxy_agent
+    return {"data": proxy_agent.messages}

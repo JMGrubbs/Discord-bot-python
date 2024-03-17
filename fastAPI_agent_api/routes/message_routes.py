@@ -1,13 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
 
 from env import API_KEY
 
 messageRoutes = APIRouter()
-
-
-class ResponseModel(BaseModel):
-    response: dict
 
 
 async def get_api_key(api_key: str):
@@ -17,14 +12,17 @@ async def get_api_key(api_key: str):
         raise HTTPException(status_code=400, detail="Invalid API Key")
 
 
-@messageRoutes.get("/getmessages", tags=["messages"], response_model=ResponseModel)
+@messageRoutes.get("/get", tags=["messages"])
 async def get_messages(request: Request):
     await get_api_key(request.headers["api-key"])
+    # json_messages = [
+    #     message.model_dump() for message in proxy_agent.messages
+    # ]
+    # print(json_messages)
+    return {"data": ["messages"]}
 
-    return {"response": {"temp": "Message sent successfully"}}
 
-
-@messageRoutes.get("/sendmessage", tags=["messages"], response_model=ResponseModel)
+@messageRoutes.get("/sendmessage", tags=["messages"])
 async def send_message(request: Request):
     await get_api_key(request.headers["api-key"])
 

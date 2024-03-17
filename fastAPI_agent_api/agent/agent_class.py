@@ -53,5 +53,9 @@ class Agent(BaseModel):
 
             self.messages.append(completion)
 
-            print(new_run)
-            print(completion)
+    async def fetch_messages(self):
+        async with openai_client_connection() as client:
+            messages = client.beta.threads.messages.list(
+                thread_id=self.current_thread_id
+            ).data
+            self.messages = messages

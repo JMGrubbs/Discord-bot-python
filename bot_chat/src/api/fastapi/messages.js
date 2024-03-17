@@ -14,7 +14,25 @@ export const sendMessage = async (mostRecentMessage) => {
         return resposne;
     } catch (error) {
         console.error('Error fetching data using sendMessage:', error);
-        return { "messages": [], "file": {}, "network_box": { "proxy_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }], "assistant_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }] } };
+        return {
+            "messages": [],
+            "file": {},
+            "network_box": {
+                "proxy_network_messages": [
+                    {
+                        "agent": "NONE",
+                        "task": "GetMessages",
+                        "message": "Error: Network Error"
+                    }
+                ], "assistant_network_messages": [
+                    {
+                        "agent": "NONE",
+                        "task": "GetMessages",
+                        "message": "Error: Network Error"
+                    }
+                ]
+            }
+        };
     }
 };
 
@@ -24,18 +42,16 @@ export const getMessages = async () => {
             'Content-Type': 'application/json',
             "api-key": apiKey,
         };
-        const resposne = await axios.get(fastApiUrl + "message/getmessages", { headers: headers })
+        const resposne = await axios.get(fastApiUrl + "agent/proxy/messages", { headers: headers })
             .then(response => {
-                return response.data["response"]
+                return response.data["data"]
             });
-        console.log("response from getMessages", resposne);
         return resposne;
     } catch (error) {
-        console.error('Error fetching data using getMessages:', error);
-        return { "messages": [], "file": {}, "network_box": { "proxy_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }], "assistant_network_messages": [{ "agent": "NONE", "task": "GetMessages", "message": "Error: Network Error" }] } };
+        console.error('Error fetching data using message/get:', error);
+        return ["Error: Network Error"];
     }
-}
-
+};
 export const deleteMessages = async () => {
     try {
         const headers = {
