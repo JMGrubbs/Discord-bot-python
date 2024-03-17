@@ -50,7 +50,12 @@ async def set_proxy_agent(request: Request):
     # await get_api_key(request.headers["api-key"])
 
     global proxy_agent
-    proxy_agent = await create_agent_obj(request.path_params["agent_id"])
+
+    new_agent_id = request.path_params["agent_id"]
+    if not proxy_agent or new_agent_id != proxy_agent.id:
+        proxy_agent = await create_agent_obj(
+            request.path_params["agent_id"]
+        )
 
     return {"agent": proxy_agent.model_dump()}
 
@@ -61,7 +66,7 @@ async def get_proxy_agent(request: Request):
 
     global proxy_agent
     if proxy_agent is None:
-        return {"Status": "No agent set!"}
+        return {"Status": False}
 
     return proxy_agent
 
@@ -72,7 +77,7 @@ async def set_proxy_thread(request: Request):
 
     global proxy_agent
     if proxy_agent is None:
-        return {"Status": "No agent set!"}
+        return {"Status": False}
 
     proxy_agent.current_thread_id = request.path_params["thread_id"]
     await proxy_agent.fetch_messages()
@@ -86,6 +91,5 @@ async def add_proxy_message(request: Request):
 
     global proxy_agent
     if proxy_agent is None:
-        return {"Status": "No agent set!"}
-
+        return {"Status": False}
     return {"data": proxy_agent.messages}

@@ -2,24 +2,20 @@ import React, { useState } from 'react';
 import Message from './Message';
 // import NetworkBox from './networkbox/NetworkBox';
 // import { getMessages, sendMessage, deleteMessages } from '../api/flask/messages.js';
-import { getMessages, sendMessage, deleteMessages } from '../api/fastapi/messages.js';
+import { select_proxy_agent } from '../api/fastapi/agents';
 
-
-function ChatApp() {
-    const [messages, setMessages] = useState([]);
+function ChatApp({ messages, fetchMessageData, addMessage }) {
     const [newMessage, setNewMessage] = useState('');
-    const [sender, setSender] = useState('');
 
     useState(async () => {
-        const response = await getMessages();
-        setMessages(response);
+        await select_proxy_agent();
+        // const messages_response = await getMessages();
+        // setMessages(messages_response);
     }, []);
 
     const handleSendMessage = () => {
         if (newMessage) {
-            let message = { id: null, message: newMessage, sender: sender, status: 'sent' };
-            setMessages(messages => [...messages, message]);
-            handleAgentResponse(message);
+            handleAgentResponse(newMessage);
             setNewMessage('');
         }
     };
@@ -31,8 +27,6 @@ function ChatApp() {
 
 
     async function handleClearMessages() {
-        setMessages([]);
-        await deleteMessages();
         return;
     }
 
@@ -54,7 +48,6 @@ function ChatApp() {
                         placeholder="Type your message..."
                         value={newMessage}
                         onChange={(e) => {
-                            setSender('user')
                             setNewMessage(e.target.value)
                         }}
                     />
