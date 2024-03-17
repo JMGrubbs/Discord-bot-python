@@ -1,32 +1,57 @@
 from pydantic import BaseModel
+from typing import Optional, List
+import time
 
-# from typing import Optional, List
+from openai_client import openai_client_connection
 
-
-class Metadata(BaseModel):
-    role: str
-    instructions: str
+INSTRUCTIONS = (
+    """Your job is to answer questions in an informative and cordial way.""",
+)
 
 
 class Agent(BaseModel):
+    id: str
+    created_at: int
+    description: Optional[str]
+    file_ids: list
+    instructions: str
+    metadata: Optional[dict]
+    model: str
     name: str
-    assistant_id: str
-    working: bool
-    metadata: Metadata
+    object: str
+    tools: List[dict]
 
-    def get_agent(self):
-        return {
-            "name": self.name,
-            "assistant_id": self.assistant_id,
-            "working": self.working,
-            "metadata": {
-                "role": self.metadata.role,
-                "instructions": self.metadata.instructions,
-            },
-        }
+    current_thread_id: Optional[str] = None
+    current_run_status: Optional[str] = None
+    messages: list = []
 
-    def get_instructions(self):
-        return self.metadata.instructions
+    async def get_completion(self, prompt: str):
+        async with openai_client_connection() as client:
+            new_user_prompt = client.beta.threads.messages.create(
+                thread_id=self.current_thread_id,
+                content=prompt,
+                role="user",
+            )
+            self.messages.append(new_user_prompt.model_dump())
+            new_run = client.beta.threads.runs.create(
+                thread_id=self.current_thread_id,
+                assistant_id=self.id,
+                # instructions=self.instructions,
+                instructions=INSTRUCTIONS[0],
+            )
+            self.current_run_status = new_run.status
+            while self.current_run_status != "completed":
+                new_run = client.beta.threads.runs.retrieve(
+                    thread_id=self.current_thread_id, run_id=new_run.id
+                )
+                self.current_run_status = new_run.status
+                time.sleep(0.5)
 
-    def set_working_status(self, status: bool):
-        self.working = status
+            completion = client.beta.threads.messages.list(
+                thread_id=self.current_thread_id
+            ).data
+
+            self.messages.append(completion)
+
+            print(new_run)
+            print(completion)

@@ -18,14 +18,14 @@ async def get_api_key(api_key: str):
 
 @threadRoutes.get("/get")
 async def get_messages(request: Request):
-    # await get_api_key(request.headers["api-key"])
+    await get_api_key(request.headers["api-key"])
     threads = await get_threads()
     return {"data": threads}
 
 
-@threadRoutes.get("/create")
+@threadRoutes.post("/create")
 async def send_message(request: Request):
-    # await get_api_key(request.headers["api-key"])
+    await get_api_key(request.headers["api-key"])
     new_thread = await create_thread()
 
     return new_thread.model_dump()
