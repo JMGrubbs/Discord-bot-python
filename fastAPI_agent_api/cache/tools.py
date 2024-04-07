@@ -22,9 +22,7 @@ async def get_set_cache(key=None, *args, **kwargs):
             obj_type_list = await rd.hgetall(namespace)
             if obj_type_list:
                 for obj_type_el in obj_type_list:
-                    obj_type_list[obj_type_el] = json.loads(
-                        obj_type_list[obj_type_el]
-                    )
+                    obj_type_list[obj_type_el] = json.loads(obj_type_list[obj_type_el])
                 return obj_type_list
             else:
                 return {}

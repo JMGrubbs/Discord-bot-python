@@ -4,19 +4,15 @@ from agent.agent_class import Agent
 
 
 async def get_agents_from_openai():
+    agents = []
     async with openai_client_connection() as client:
         agents = client.beta.assistants.list()
-        agents = [
-            {agent.model_dump().get("id"): agent.model_dump()}
-            for agent in agents
-        ]
+        agents = [{agent.model_dump().get("id"): agent.model_dump()} for agent in agents]
 
-        for agent in agents:
-            agent_id = list(agent.keys())[0]
-            await get_set_cache(
-                key=agent_id, namespace="agents", obj_type=agent
-            )
-        return agents
+    for agent in agents:
+        agent_id = list(agent.keys())[0]
+        await get_set_cache(key=agent_id, namespace="agents", obj_type=agent)
+    return agents
 
 
 async def get_agents_from_cache():

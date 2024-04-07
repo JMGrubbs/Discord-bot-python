@@ -23,6 +23,7 @@ async def get_api_key(api_key: str):
 async def get_messages(request: Request):
     await get_api_key(request.headers["api-key"])
     threads = await get_threads()
+    print("Threads: ", threads)
     return {"data": threads}
 
 

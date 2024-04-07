@@ -1,28 +1,29 @@
 import React, { useState } from 'react';
 import Message from './Message';
 // import NetworkBox from './networkbox/NetworkBox';
-// import { getMessages, sendMessage, deleteMessages } from '../api/flask/messages.js';
 import { select_proxy_agent } from '../api/fastapi/agents';
 
 function ChatApp({ messages, fetchMessageData, addMessage }) {
     const [newMessage, setNewMessage] = useState('');
+    // const [localMessages, setLocalMessages] = useState([]);
 
     useState(async () => {
         await select_proxy_agent();
         // const messages_response = await getMessages();
-        // setMessages(messages_response);
+        // if (messages.length !== 0) {
+        //     setLocalMessages(messages);
+        // }
     }, []);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async (event) => {
         if (newMessage) {
-            handleAgentResponse(newMessage);
-            setNewMessage('');
-        }
-    };
+            let temp = event.currentTarget.getAttribute('id');
+            console.log('newMessage:', newMessage, temp);
+            // addMessage({ content: [{ text: { value: newMessage } }, { type: 'text' }], assistant_id: null });
+            console.log(messages);
 
-    const handleAgentResponse = async (response) => {
-        // response = await sendMessage(response);
-        console.log("response from handleAgentResponse", response);
+            setNewMessage(null);
+        }
     };
 
 

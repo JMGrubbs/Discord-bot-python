@@ -16,9 +16,10 @@ export const getMessages = async () => {
         return resposne;
     } catch (error) {
         console.error('Error fetching data using message/get:', error);
-        return ["Error: Network Error"];
+        return ["Error: API Error"];
     }
 };
+
 export const deleteMessages = async () => {
     try {
         const headers = {
@@ -30,6 +31,6 @@ export const deleteMessages = async () => {
         return response.data["response"];
     } catch (error) {
         console.error('Error fetching data using deleteMessage:', error);
-        return { "status": "error", "message": "Error deleteing responses from api" };
+        return ["Error: API Error"];
     }
 }

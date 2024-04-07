@@ -34,6 +34,8 @@ async def get_agents_openai(request: Request):
 async def get_agents(request: Request):
     await get_api_key(request.headers["api-key"])
     agents = await get_agents_from_cache()
+    if agents == {}:
+        agents = await get_agents_from_openai()
     return agents
 
 
@@ -53,9 +55,7 @@ async def set_proxy_agent(request: Request):
 
     new_agent_id = request.path_params["agent_id"]
     if not proxy_agent or new_agent_id != proxy_agent.id:
-        proxy_agent = await create_agent_obj(
-            request.path_params["agent_id"]
-        )
+        proxy_agent = await create_agent_obj(request.path_params["agent_id"])
 
     return {"agent": proxy_agent.model_dump()}
 
